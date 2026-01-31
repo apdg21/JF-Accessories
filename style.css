@@ -228,18 +228,32 @@ h1, h2, h3, h4 {
 }
 
 /* Featured Earrings */
+/* Featured Earrings Section */
 .featured-section {
     padding: 4rem 0;
     background-color: var(--light-pink);
+    text-align: center;
 }
 
 .featured-earrings {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
     margin-top: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
+/* Optional: Add container if not already present */
+.featured-section .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Ensure product cards don't stretch too much */
 .product-card {
     background-color: white;
     border-radius: 15px;
@@ -247,8 +261,9 @@ h1, h2, h3, h4 {
     box-shadow: var(--shadow);
     transition: var(--transition);
     padding-bottom: 1.5rem;
+    max-width: 320px; /* Optional: limit max width */
+    margin: 0 auto; /* Centers card within grid cell */
 }
-
 .product-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
