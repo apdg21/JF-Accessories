@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Earrings - JF Accessories</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-form-page {
+            padding: 2rem 0;
+            background-color: var(--light-pink);
+            min-height: 100vh;
+        }
+        
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-header h1 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--medium-pink);
+            padding-bottom: 1rem;
+        }
+        
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark-color);
+        }
+        
+        .tab-btn.active {
+            background-color: white;
+            color: var(--secondary-color);
+            border: 2px solid var(--medium-pink);
+            border-bottom: none;
+            position: relative;
+            top: 2px;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-label .required {
+            color: #e74c3c;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(248, 165, 194, 0.2);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .image-upload-section {
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            background-color: rgba(248, 165, 194, 0.05);
+        }
+        
+        .image-naming-info {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .image-naming-info h4 {
+            margin-top: 0;
+            color: var(--secondary-color);
+        }
+        
+        .image-example {
+            font-family: 'Courier New', monospace;
+            background: #2d2d2d;
+            color: #fff;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            display: inline-block;
+        }
+        
+        .images-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .image-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 150px;
+            background-color: #f5f5f5;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        .image-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--light-pink);
+        }
+        
+        .btn-save {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-reset {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            border: 2px solid #ddd;
+        }
+        
+        .btn-reset:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* View Earrings Tab */
+        .earings-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .earing-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            border: 1px solid #eee;
+        }
+        
+        .earing-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        .earing-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .earing-info {
+            padding: 1rem;
+        }
+        
+        .earing-name {
+            font-size: 1.2rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--secondary-color);
+        }
+        
+        .earing-price {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0 0 1rem 0;
+        }
+        
+        .earing-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-edit, .btn-delete {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+        
+        .btn-edit {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: var(--dark-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            border-left: 4px solid var(--primary-color);
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            border-left-color: #2ecc71;
+        }
+        
+        .notification.error {
+            border-left-color: #e74c3c;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .earings-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                border-radius: 8px;
+                margin-bottom: 0.5rem;
+            }
+            
+            .tab-btn.active {
+                top: 0;
+                border-bottom: 2px solid var(--medium-pink);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header-container"></div>
+    
+    <main class="admin-form-page">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1><i class="fas fa-crown"></i> JF Accessories Admin</h1>
+                <p>Manage your earrings collection</p>
+            </div>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="add-earing">
+                    <i class="fas fa-plus-circle"></i> Add New Earring
+                </button>
+                <button class="tab-btn" data-tab="view-earings">
+                    <i class="fas fa-eye"></i> View All Earrings
+                </button>
+                <button class="tab-btn" data-tab="export-data">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+            
+            <!-- Add Earring Tab -->
+            <div id="add-earing" class="tab-content active">
+                <form id="earing-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Earring Name <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="earing-name" 
+                                   placeholder="e.g., Pearl Drops" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                Price (₱) <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="earing-price" 
+                                   placeholder="e.g., ₱299" required>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                Description <span class="required">*</span>
+                            </label>
+                            <textarea class="form-textarea" id="earing-description" 
+                                      placeholder="Describe the earrings..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                Material <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="earing-material" 
+                                   placeholder="e.g., Sterling Silver with Pearls" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                Size <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="earing-size" 
+                                   placeholder="e.g., 2.5 cm length" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Weight</label>
+                            <input type="text" class="form-input" id="earing-weight" 
+                                   placeholder="e.g., Lightweight (4g)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Closure Type</label>
+                            <select class="form-select" id="earing-closure">
+                                <option value="Butterfly Back">Butterfly Back</option>
+                                <option value="Screw Back">Screw Back</option>
+                                <option value="Hinged Snap">Hinged Snap</option>
+                                <option value="Hook">Hook</option>
+                                <option value="Leverback">Leverback</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Hypoallergenic</label>
+                            <select class="form-select" id="earing-hypoallergenic">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Care Instructions</label>
+                            <input type="text" class="form-input" id="earing-care" 
+                                   placeholder="e.g., Avoid water and perfume">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                Category <span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="earing-category" required>
+                                <option value="">Select Category</option>
+                                <option value="stud">Studs</option>
+                                <option value="hoop">Hoops</option>
+                                <option value="dangle">Dangles</option>
+                                <option value="statement">Statement</option>
+                                <option value="huggie">Huggies</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                Image Names <span class="required">*</span>
+                            </label>
+                            <div class="image-upload-section">
+                                <p>Place your images in the <strong>assets/earings/</strong> folder</p>
+                                <p>Name them using this format:</p>
+                                
+                                <div class="image-naming-info">
+                                    <h4><i class="fas fa-info-circle"></i> Image Naming Convention:</h4>
+                                    <p>For each earring, use this pattern:</p>
+                                    <div class="image-example">earing1a.jpg (Main image)</div>
+                                    <div class="image-example">earing1b.jpg (Second view)</div>
+                                    <div class="image-example">earing1c.jpg (Third view)</div>
+                                    <div class="image-example">earing1d.jpg (Fourth view)</div>
+                                    <div class="image-example">earing1e.jpg (Fifth view)</div>
+                                    
+                                    <p style="margin-top: 1rem;"><strong>Next earring:</strong> earing2a.jpg, earing2b.jpg, etc.</p>
+                                </div>
+                                
+                                <div style="margin-top: 1.5rem;">
+                                    <label class="form-label">Enter image names (without folder path):</label>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <input type="text" class="form-input" id="image-base-name" 
+                                               placeholder="e.g., earing1" style="flex: 1;">
+                                        <span style="font-weight: bold;">a.jpg</span>
+                                    </div>
+                                    <small style="display: block; margin-top: 0.5rem; color: #666;">
+                                        The system will automatically add a,b,c,d,e for up to 5 images
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <div class="images-list" id="images-preview">
+                                <!-- Image previews will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary btn-save">
+                            <i class="fas fa-save"></i> Save Earring
+                        </button>
+                        <button type="reset" class="btn-secondary btn-reset">
+                            <i class="fas fa-redo"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- View Earrings Tab -->
+            <div id="view-earings" class="tab-content">
+                <div id="earings-list-container">
+                    <p>Loading earrings...</p>
+                </div>
+            </div>
+            
+            <!-- Export Data Tab -->
+            <div id="export-data" class="tab-content">
+                <h3>Export Earrings Data</h3>
+                <p>Copy the JSON data below and save it to <code>earings-data.json</code> file.</p>
+                
+                <div style="margin: 1.5rem 0;">
+                    <button id="copy-json-btn" class="btn-primary">
+                        <i class="fas fa-copy"></i> Copy JSON to Clipboard
+                    </button>
+                    <button id="download-json-btn" class="btn-secondary">
+                        <i class="fas fa-download"></i> Download JSON File
+                    </button>
+                </div>
+                
+                <textarea id="json-output" style="width: 100%; height: 300px; padding: 1rem; font-family: 'Courier New', monospace; border: 2px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
+                
+                <div style="margin-top: 1rem;">
+                    <p><strong>Instructions:</strong></p>
+                    <ol style="margin-left: 1.5rem;">
+                        <li>Copy the JSON data above</li>
+                        <li>Open the <code>earings-data.json</code> file in your website folder</li>
+                        <li>Replace all content with the copied JSON</li>
+                        <li>Save the file</li>
+                        <li>Refresh the earings page to see changes</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer-container"></div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script src="script.js"></script>
+    <script src="admin-form.js"></script>
+</body>
+</html>
