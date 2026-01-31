@@ -409,6 +409,155 @@ h1, h2, h3, h4 {
     color: #aaa;
 }
 
+/* Earings Page Specific Styles */
+.earings-page .page-header {
+    text-align: center;
+    padding: 3rem 0 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: var(--dark-color);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    text-align: center;
+}
+
+/* 4x3 Grid Layout for Earings */
+.earings-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns */
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+/* Ensure product cards on earings page have consistent height */
+.earings-page .product-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.earings-page .product-image {
+    height: 220px;
+    flex-shrink: 0;
+}
+
+.earings-page .product-card h3 {
+    flex-grow: 0;
+}
+
+.earings-page .price {
+    flex-grow: 0;
+}
+
+.earings-page .product-card .btn-secondary {
+    margin-top: auto;
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 3rem 0;
+}
+
+.pagination-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--primary-color);
+    background-color: white;
+    color: var(--secondary-color);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: var(--light-pink);
+    transform: translateY(-2px);
+}
+
+.pagination-btn.active {
+    background-color: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Order CTA Section */
+.order-cta {
+    background-color: var(--light-pink);
+    padding: 3rem 0;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.order-cta h2 {
+    margin-bottom: 1rem;
+    color: var(--secondary-color);
+}
+
+.order-cta p {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn-primary,
+.cta-buttons .btn-secondary {
+    min-width: 220px;
+}
+
+/* Responsive Design for 4x3 Grid */
+@media (max-width: 1200px) {
+    .earings-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */
+    }
+}
+
+@media (max-width: 992px) {
+    .earings-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+    }
+}
+
+@media (max-width: 576px) {
+    .earings-grid {
+        grid-template-columns: 1fr; /* 1 column on mobile */
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-buttons .btn-primary,
+    .cta-buttons .btn-secondary {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
 /* Chat Widget */
 .chat-widget {
     position: fixed;
