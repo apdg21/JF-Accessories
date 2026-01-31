@@ -140,7 +140,19 @@ function initEaringsPage() {
         { id: 9, name: "Minimalist Hoops", price: "₱259", images: ["earing9_1.jpg", "earing9_2.jpg", "earing9_3.jpg"] },
         { id: 10, name: "Bold Statement", price: "₱429", images: ["earing10_1.jpg", "earing10_2.jpg", "earing10_3.jpg"] },
         { id: 11, name: "Moon & Stars", price: "₱389", images: ["earing11_1.jpg", "earing11_2.jpg", "earing11_3.jpg"] },
-        { id: 12, name: "Feather Dangles", price: "₱339", images: ["earing12_1.jpg", "earing12_2.jpg", "earing12_3.jpg"] }
+        { id: 12, name: "Feather Dangles", price: "₱339", images: ["earing12_1.jpg", "earing12_2.jpg", "earing12_3.jpg"] },
+        { id: 13, name: "Pearl Cluster", price: "₱379", images: ["earing13_1.jpg", "earing13_2.jpg", "earing13_3.jpg"] },
+        { id: 14, name: "Gold Bar", price: "₱299", images: ["earing14_1.jpg", "earing14_2.jpg", "earing14_3.jpg"] },
+        { id: 15, name: "Diamond Studs", price: "₱449", images: ["earing15_1.jpg", "earing15_2.jpg", "earing15_3.jpg"] },
+        { id: 16, name: "Silver Leaves", price: "₱329", images: ["earing16_1.jpg", "earing16_2.jpg", "earing16_3.jpg"] },
+        { id: 17, name: "Turquoise Drops", price: "₱399", images: ["earing17_1.jpg", "earing17_2.jpg", "earing17_3.jpg"] },
+        { id: 18, name: "Crystal Hoops", price: "₱369", images: ["earing18_1.jpg", "earing18_2.jpg", "earing18_3.jpg"] },
+        { id: 19, name: "Ruby Red", price: "₱419", images: ["earing19_1.jpg", "earing19_2.jpg", "earing19_3.jpg"] },
+        { id: 20, name: "Sapphire Blue", price: "₱439", images: ["earing20_1.jpg", "earing20_2.jpg", "earing20_3.jpg"] },
+        { id: 21, name: "Emerald Green", price: "₱429", images: ["earing21_1.jpg", "earing21_2.jpg", "earing21_3.jpg"] },
+        { id: 22, name: "Amethyst Drops", price: "₱389", images: ["earing22_1.jpg", "earing22_2.jpg", "earing22_3.jpg"] },
+        { id: 23, name: "Citrine Studs", price: "₱359", images: ["earing23_1.jpg", "earing23_2.jpg", "earing23_3.jpg"] },
+        { id: 24, name: "Opal Dreams", price: "₱469", images: ["earing24_1.jpg", "earing24_2.jpg", "earing24_3.jpg"] }
     ];
     
     // Display earings with pagination
@@ -149,7 +161,7 @@ function initEaringsPage() {
     
     if (!earingsContainer) return;
     
-    const itemsPerPage = 10;
+    const itemsPerPage = 12; // 4 columns × 3 rows = 12 items per page
     let currentPage = 1;
     
     function displayEarings(page) {
@@ -201,12 +213,42 @@ function initEaringsPage() {
             if (page > 1) {
                 currentPage = page - 1;
                 displayEarings(currentPage);
+                window.scrollTo({ top: earingsContainer.offsetTop - 100, behavior: 'smooth' });
             }
         });
         paginationContainer.appendChild(prevButton);
         
+        // Page numbers - show limited numbers for better UX
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        // First page button if not visible
+        if (startPage > 1) {
+            const firstButton = document.createElement('button');
+            firstButton.className = 'pagination-btn';
+            firstButton.textContent = '1';
+            firstButton.addEventListener('click', () => {
+                currentPage = 1;
+                displayEarings(currentPage);
+                window.scrollTo({ top: earingsContainer.offsetTop - 100, behavior: 'smooth' });
+            });
+            paginationContainer.appendChild(firstButton);
+            
+            if (startPage > 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.padding = '0 5px';
+                paginationContainer.appendChild(ellipsis);
+            }
+        }
+        
         // Page numbers
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = startPage; i <= endPage; i++) {
             const pageButton = document.createElement('button');
             pageButton.className = 'pagination-btn';
             pageButton.textContent = i;
@@ -216,8 +258,29 @@ function initEaringsPage() {
             pageButton.addEventListener('click', () => {
                 currentPage = i;
                 displayEarings(currentPage);
+                window.scrollTo({ top: earingsContainer.offsetTop - 100, behavior: 'smooth' });
             });
             paginationContainer.appendChild(pageButton);
+        }
+        
+        // Last page button if not visible
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.padding = '0 5px';
+                paginationContainer.appendChild(ellipsis);
+            }
+            
+            const lastButton = document.createElement('button');
+            lastButton.className = 'pagination-btn';
+            lastButton.textContent = totalPages;
+            lastButton.addEventListener('click', () => {
+                currentPage = totalPages;
+                displayEarings(currentPage);
+                window.scrollTo({ top: earingsContainer.offsetTop - 100, behavior: 'smooth' });
+            });
+            paginationContainer.appendChild(lastButton);
         }
         
         // Next button
@@ -229,6 +292,25 @@ function initEaringsPage() {
             if (page < totalPages) {
                 currentPage = page + 1;
                 displayEarings(currentPage);
+                window.scrollTo({ top: earingsContainer.offsetTop - 100, behavior: 'smooth' });
+            }
+        });
+        paginationContainer.appendChild(nextButton);
+    }
+    
+    // Add event listener for "Open Order Chat" button
+    const openChatBtn = document.querySelector('.open-chat-btn');
+    if (openChatBtn) {
+        openChatBtn.addEventListener('click', function() {
+            const chatWidget = document.querySelector('.chat-widget');
+            if (chatWidget) {
+                chatWidget.classList.add('active');
+            }
+        });
+    }
+    
+    // Initial display
+    displayEarings(currentPage);
             }
         });
         paginationContainer.appendChild(nextButton);
