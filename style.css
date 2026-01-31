@@ -188,6 +188,7 @@ h1, h2, h3, h4 {
     flex: 1;
     min-width: 300px;
     padding-right: 2rem;
+    text-align: center;
 }
 
 .hero-content h1 {
@@ -198,7 +199,8 @@ h1, h2, h3, h4 {
 .hero-content p {
     font-size: 1.2rem;
     margin-bottom: 2rem;
-    max-width: 500px;
+    text-align: center;
+    padding: 20px;
 }
 
 .hero-images {
