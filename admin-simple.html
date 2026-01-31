@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Update Earrings Data</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-simple {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .instructions ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .data-editor {
+            margin: 2rem 0;
+        }
+        
+        .editor-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-download {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-copy {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-copy:hover {
+            background-color: #0b7dda;
+        }
+        
+        #json-editor {
+            width: 100%;
+            height: 500px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        
+        .preview-section {
+            margin-top: 3rem;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header-container"></div>
+    
+    <main class="admin-simple">
+        <h1 class="section-title">Earrings Data Manager</h1>
+        
+        <div class="instructions">
+            <h3>How to Update Earrings:</h3>
+            <ol>
+                <li>Edit the JSON data below to add, remove, or update earrings</li>
+                <li>Click "Copy JSON" to copy the data to clipboard</li>
+                <li>Open the <code>earings-data.json</code> file in your website folder</li>
+                <li>Replace the content with the copied JSON data</li>
+                <li>Save the file and refresh the earings page</li>
+            </ol>
+            <p><strong>Note:</strong> Make sure the JSON format is valid. You can validate it at <a href="https://jsonlint.com" target="_blank">jsonlint.com</a></p>
+        </div>
+        
+        <div class="data-editor">
+            <h3>Edit Earrings Data (JSON Format)</h3>
+            <textarea id="json-editor"></textarea>
+            <div class="editor-actions">
+                <button id="load-btn" class="btn-primary">
+                    <i class="fas fa-sync"></i> Load Current Data
+                </button>
+                <button id="validate-btn" class="btn-secondary">
+                    <i class="fas fa-check-circle"></i> Validate JSON
+                </button>
+                <button id="copy-btn" class="btn-copy">
+                    <i class="fas fa-copy"></i> Copy JSON
+                </button>
+                <button id="download-btn" class="btn-download">
+                    <i class="fas fa-download"></i> Download JSON File
+                </button>
+                <button id="add-sample-btn" class="btn-secondary">
+                    <i class="fas fa-plus"></i> Add Sample Earring
+                </button>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <h3>Preview (First 4 Earrings)</h3>
+            <div id="preview-container" class="preview-grid">
+                <!-- Preview will be loaded here -->
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer-container"></div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script src="script.js"></script>
+    <script src="admin-simple.js"></script>
+</body>
+</html>
