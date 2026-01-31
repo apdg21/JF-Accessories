@@ -261,7 +261,7 @@ h1, h2, h3, h4 {
     box-shadow: var(--shadow);
     transition: var(--transition);
     padding-bottom: 1.5rem;
-    max-width: 320px; /* Optional: limit max width */
+    max-width: 375px; /* Optional: limit max width */
     margin: 0 auto; /* Centers card within grid cell */
 }
 .product-card:hover {
