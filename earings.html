@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earrings Collection - JF Accessories</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <main class="earings-page">
+        <section class="page-header">
+            <div class="container">
+                <h1 class="section-title">Earrings Collection</h1>
+                <p class="page-subtitle">Discover our handcrafted earrings, each piece made with love and attention to detail.</p>
+            </div>
+        </section>
+        
+        <section class="earings-section">
+            <div class="container">
+                <div id="earings-container" class="earings-grid">
+                    <!-- Earings will be loaded here via JavaScript -->
+                </div>
+                
+                <div id="pagination" class="pagination">
+                    <!-- Pagination will be loaded here via JavaScript -->
+                </div>
+            </div>
+        </section>
+        
+        <section class="order-cta">
+            <div class="container">
+                <h2>Ready to Order?</h2>
+                <p>Click on any earring to see more details and place your order. You can message us directly through Facebook Messenger or use our chat feature.</p>
+                <div class="cta-buttons">
+                    <a href="https://facebook.com" target="_blank" class="btn-primary"><i class="fab fa-facebook-messenger"></i> Message on Facebook</a>
+                    <button class="btn-secondary open-chat-btn"><i class="fas fa-shopping-cart"></i> Open Order Chat</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-header">
+            <h4>Order Inquiry</h4>
+            <button class="close-chat"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-body">
+            <div class="chat-messages">
+                <div class="message bot">
+                    <p>Hello! I'm Jean from JF Accessories. How can I help you with your order?</p>
+                </div>
+            </div>
+            <div class="chat-input">
+                <textarea placeholder="Type your message here..."></textarea>
+                <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <button class="chat-toggle">
+        <i class="fas fa-shopping-cart"></i> Order Help
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
