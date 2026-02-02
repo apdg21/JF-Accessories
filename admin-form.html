@@ -117,7 +117,7 @@
             resize: vertical;
         }
         
-        /* Image Input Section - Simplified */
+        /* Image Input Section */
         .image-input-section {
             background-color: #f9f9f9;
             padding: 1.5rem;
@@ -177,6 +177,20 @@
             padding: 0.5rem;
         }
         
+        /* Edit Status */
+        #edit-status {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        #edit-status i {
+            color: #2196F3;
+            margin-right: 8px;
+        }
+        
         .form-actions {
             display: flex;
             gap: 1rem;
@@ -203,6 +217,15 @@
         
         .btn-reset:hover {
             background-color: #e9ecef;
+        }
+        
+        #cancel-edit-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        #cancel-edit-btn:hover {
+            background-color: #5a6268;
         }
         
         /* View Earrings Tab */
@@ -305,6 +328,10 @@
             border-left-color: #e74c3c;
         }
         
+        .notification.info {
+            border-left-color: #3498db;
+        }
+        
         .form-help {
             font-size: 0.85rem;
             color: #666;
@@ -371,11 +398,23 @@
                 top: 0;
                 border-bottom: 2px solid var(--medium-pink);
             }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .form-actions button {
+                width: 100%;
+            }
         }
         
         @media (max-width: 480px) {
             .image-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tab-content {
+                padding: 1rem;
             }
         }
     </style>
@@ -404,6 +443,11 @@
             
             <!-- Add Earring Tab -->
             <div id="add-earing" class="tab-content active">
+                <!-- Edit Status Indicator -->
+                <div id="edit-status" style="display: none;">
+                    <i class="fas fa-edit"></i> <strong>Editing Mode:</strong> You are editing an existing earring. Click "Update Earring" to save changes.
+                </div>
+                
                 <form id="earing-form">
                     <div class="quick-tips">
                         <h4><i class="fas fa-lightbulb"></i> Quick Tips:</h4>
@@ -595,6 +639,9 @@
                         <button type="submit" class="btn-primary btn-save">
                             <i class="fas fa-save"></i> Save Earring
                         </button>
+                        <button type="button" id="cancel-edit-btn" class="btn-secondary" style="display: none;">
+                            <i class="fas fa-times"></i> Cancel Edit
+                        </button>
                         <button type="reset" class="btn-secondary btn-reset">
                             <i class="fas fa-redo"></i> Clear Form
                         </button>
@@ -604,6 +651,8 @@
             
             <!-- View Earrings Tab -->
             <div id="view-earings" class="tab-content">
+                <h3>All Earrings</h3>
+                <p>Total earrings: <span id="earings-count">0</span></p>
                 <div id="earings-list-container">
                     <p>Loading earrings...</p>
                 </div>
@@ -621,6 +670,11 @@
                     <button id="download-json-btn" class="btn-secondary">
                         <i class="fas fa-download"></i> Download JSON File
                     </button>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label><strong>JSON Data:</strong></label>
+                    <div class="form-help">Copy this data and save as earings-data.json</div>
                 </div>
                 
                 <textarea id="json-output" style="width: 100%; height: 300px; padding: 1rem; font-family: 'Courier New', monospace; border: 2px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
