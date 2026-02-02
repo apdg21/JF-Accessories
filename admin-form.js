@@ -1,4 +1,4 @@
-// Admin Form JavaScript - Simplified with fixed save
+// Admin Form JavaScript - Complete with working Edit functionality
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.querySelector('.admin-form-page')) return;
     
@@ -6,6 +6,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initAdminForm() {
+    console.log('Admin form initialized');
+    
+    // Initialize earings data and editing state
+    let earings = [];
+    let editingId = null;
+    
+    // DOM Elements
+    const form = document.getElementById('earing-form');
+    const jsonOutput = document.getElementById('json-output');
+    const copyJsonBtn = document.getElementById('copy-json-btn');
+    const downloadJsonBtn = document.getElementById('download-json-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn') || createCancelButton();
+    const editStatus = document.getElementById('edit-status') || createEditStatus();
+    
+    // Load data immediately
+    loadInitialData().then(data => {
+        earings = data;
+        console.log('Initial data loaded:', earings.length, 'earings');
+        loadEaringsList();
+        updateJSONOutput();
+    });
+    
     // Tab functionality
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -13,6 +35,9 @@ function initAdminForm() {
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tabId = button.getAttribute('data-tab');
+            
+            // Clear editing state when switching tabs
+            clearEditState();
             
             // Update active tab button
             tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -35,23 +60,19 @@ function initAdminForm() {
         });
     });
     
-    // Form elements
-    const form = document.getElementById('earing-form');
-    const jsonOutput = document.getElementById('json-output');
-    const copyJsonBtn = document.getElementById('copy-json-btn');
-    const downloadJsonBtn = document.getElementById('download-json-btn');
-    
-    // Initialize earings data
-    let earings = loadEaringsFromStorage();
-    
     // Set up image previews
     setupImagePreviews();
     
     // Form submission
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log('Form submitted');
+        console.log('=== FORM SUBMIT START ===');
         saveEaring();
+    });
+    
+    // Form reset
+    form.addEventListener('reset', function() {
+        clearEditState();
     });
     
     // Copy JSON button
@@ -60,13 +81,48 @@ function initAdminForm() {
     // Download JSON button
     downloadJsonBtn.addEventListener('click', downloadJSON);
     
-    // Initial load
-    loadEaringsList();
-    updateJSONOutput();
+    // Cancel edit button
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', function() {
+            clearEditState();
+            form.reset();
+            showNotification('Edit cancelled.', 'info');
+        });
+    }
     
     // Functions
+    async function loadInitialData() {
+        console.log('Loading initial data...');
+        
+        // First try localStorage
+        try {
+            const saved = localStorage.getItem('jfEarings');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                console.log('Loaded from localStorage:', parsed.length, 'items');
+                return Array.isArray(parsed) ? parsed : [];
+            }
+        } catch (error) {
+            console.error('Error loading from localStorage:', error);
+        }
+        
+        // Try JSON file as fallback
+        try {
+            const response = await fetch('earings-data.json');
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Loaded from JSON file:', data.earings?.length || 0, 'items');
+                return data.earings || [];
+            }
+        } catch (error) {
+            console.log('No JSON file found or error:', error);
+        }
+        
+        console.log('No data found, starting with empty array');
+        return [];
+    }
+    
     function setupImagePreviews() {
-        // Setup preview for each image input
         const imageInputs = ['a', 'b', 'c', 'd', 'e'];
         
         imageInputs.forEach(letter => {
@@ -92,32 +148,52 @@ function initAdminForm() {
             return;
         }
         
-        // For local testing, we'll use a placeholder
-        // In production, this would check the actual file
+        // Clean the filename
+        const cleanName = imageName.split('/').pop().split('\\').pop();
+        
         const img = new Image();
-        const testPath = `assets/earings/${imageName}`;
+        
+        // Try multiple possible paths
+        const testPaths = [
+            `assets/earings/${cleanName}`,
+            `./assets/earings/${cleanName}`,
+            cleanName
+        ];
+        
+        let currentPathIndex = 0;
+        
+        function tryNextPath() {
+            if (currentPathIndex >= testPaths.length) {
+                previewElement.innerHTML = `
+                    <div class="image-placeholder">
+                        <i class="fas fa-question-circle"></i><br>
+                        ${cleanName}<br>
+                        <small>(Will work when uploaded)</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            const testPath = testPaths[currentPathIndex];
+            img.src = testPath;
+            currentPathIndex++;
+        }
         
         img.onload = function() {
-            previewElement.innerHTML = `<img src="${testPath}" class="image-preview" alt="${imageName}">`;
+            previewElement.innerHTML = `<img src="${img.src}" class="image-preview" alt="${cleanName}">`;
         };
         
         img.onerror = function() {
-            previewElement.innerHTML = `
-                <div class="image-placeholder">
-                    <i class="fas fa-question-circle"></i><br>
-                    ${imageName}<br>
-                    <small>(File not found)</small>
-                </div>
-            `;
+            tryNextPath();
         };
         
-        img.src = testPath;
+        tryNextPath();
     }
     
     function saveEaring() {
         console.log('Starting save process...');
         
-        // Get form values - only name, price, description are required
+        // Get form values
         const name = document.getElementById('earing-name').value.trim();
         const price = document.getElementById('earing-price').value.trim();
         const description = document.getElementById('earing-description').value.trim();
@@ -141,6 +217,8 @@ function initAdminForm() {
             return;
         }
         
+        console.log('Form validation passed');
+        
         // Get optional fields
         const material = document.getElementById('earing-material').value.trim();
         const size = document.getElementById('earing-size').value.trim();
@@ -159,55 +237,113 @@ function initAdminForm() {
             const imageName = imageInput ? imageInput.value.trim() : '';
             
             if (imageName) {
-                // Add the full path for the image
-                images.push(`assets/earings/${imageName}`);
+                // Clean the filename
+                const cleanName = imageName.split('/').pop().split('\\').pop();
+                images.push(cleanName);
             }
         });
         
-        // Create new earring object with sensible defaults
-        const newEaring = {
-            id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
-            name: name,
-            price: price,
-            description: description,
-            material: material || 'Not specified',
-            size: size || 'Not specified',
-            weight: weight || '',
-            closure: closure || 'Butterfly Back',
-            hypoallergenic: hypoallergenic || 'Yes',
-            care: care || 'Keep dry and clean',
-            category: category || 'stud',
-            popularity: 3, // Default popularity
-            inStock: true,
-            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80']
-        };
+        let newEaring;
+        let isEditing = editingId !== null;
         
-        console.log('New earring object:', newEaring);
-        
-        // Add to earings array
-        earings.push(newEaring);
+        if (isEditing) {
+            console.log('Updating existing earring ID:', editingId);
+            
+            // Find the earring to update
+            const existingIndex = earings.findIndex(e => e.id === editingId);
+            if (existingIndex === -1) {
+                showNotification('Earring not found. Creating new one.', 'error');
+                clearEditState();
+                return saveEaring(); // Retry as new earring
+            }
+            
+            // Update existing earring - preserve some properties
+            const originalEaring = earings[existingIndex];
+            newEaring = {
+                ...originalEaring, // Preserve all original properties
+                name: name,
+                price: price,
+                description: description,
+                material: material || 'Not specified',
+                size: size || 'Not specified',
+                weight: weight || '',
+                closure: closure || 'Butterfly Back',
+                hypoallergenic: hypoallergenic || 'Yes',
+                care: care || 'Keep dry and clean',
+                category: category || 'stud',
+                images: images.length > 0 ? images : (originalEaring.images || ['default.jpg'])
+            };
+            
+            // Replace the old earring with updated one
+            earings[existingIndex] = newEaring;
+            console.log('Updated earring at index:', existingIndex);
+        } else {
+            console.log('Creating new earring');
+            
+            // Create new earring object
+            newEaring = {
+                id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
+                name: name,
+                price: price,
+                description: description,
+                material: material || 'Not specified',
+                size: size || 'Not specified',
+                weight: weight || '',
+                closure: closure || 'Butterfly Back',
+                hypoallergenic: hypoallergenic || 'Yes',
+                care: care || 'Keep dry and clean',
+                category: category || 'stud',
+                popularity: 3,
+                inStock: true,
+                images: images.length > 0 ? images : ['default.jpg']
+            };
+            
+            // Add to earings array
+            earings.push(newEaring);
+            console.log('Added new earring. Total earings:', earings.length);
+        }
         
         // Save to localStorage
-        saveEaringsToStorage(earings);
+        try {
+            localStorage.setItem('jfEarings', JSON.stringify(earings));
+            console.log('Saved to localStorage.');
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+            showNotification('Error saving data. Please try again.', 'error');
+            return;
+        }
         
-        // Reset form
+        // Reset form and editing state
         form.reset();
+        clearEditState();
         
         // Update views
         loadEaringsList();
         updateJSONOutput();
         
         // Show success message
-        showNotification(`"${name}" added successfully!`, 'success');
+        const message = isEditing ? 
+            `✅ "${name}" updated successfully!` : 
+            `✅ "${name}" added successfully!`;
+        showNotification(message, 'success');
         
-        // Switch to view tab
+        // Switch to view tab after a delay
         setTimeout(() => {
             document.querySelector('[data-tab="view-earings"]').click();
-        }, 1000);
+        }, 1500);
+        
+        console.log('=== SAVE COMPLETE ===');
     }
     
     function loadEaringsList() {
         const container = document.getElementById('earings-list-container');
+        
+        if (!container) {
+            console.error('Earings list container not found');
+            return;
+        }
+        
+        console.log('Loading earings list. Total earings:', earings.length);
         
         if (!earings || earings.length === 0) {
             container.innerHTML = '<p>No earrings found. Add your first earring!</p>';
@@ -218,7 +354,7 @@ function initAdminForm() {
             <div class="earings-list">
                 ${earings.map(earing => `
                     <div class="earing-item" data-id="${earing.id}">
-                        <div class="earing-image" style="background-image: url('${earing.images[0] || getDefaultImage()}')"></div>
+                        <div class="earing-image" style="background-image: url('${getImageUrl(earing.images[0])}')"></div>
                         <div class="earing-info">
                             <h3 class="earing-name">${earing.name}</h3>
                             <p class="earing-price">${earing.price}</p>
@@ -254,11 +390,23 @@ function initAdminForm() {
                 deleteEaring(id);
             });
         });
+        
+        console.log('Earings list loaded successfully');
     }
     
     function editEaring(id) {
+        console.log('Editing earring ID:', id);
         const earing = earings.find(e => e.id === id);
-        if (!earing) return;
+        if (!earing) {
+            console.error('Earring not found:', id);
+            return;
+        }
+        
+        // Set editing mode
+        editingId = id;
+        
+        // Update UI for edit mode
+        setEditMode(true);
         
         // Fill form with earring data
         document.getElementById('earing-name').value = earing.name;
@@ -272,41 +420,89 @@ function initAdminForm() {
         document.getElementById('earing-care').value = earing.care;
         document.getElementById('earing-category').value = earing.category;
         
-        // Fill image inputs
-        if (earing.images && earing.images.length > 0) {
-            // Extract just the filenames from the paths
-            for (let i = 0; i < Math.min(earing.images.length, 5); i++) {
-                const imagePath = earing.images[i];
-                const imageName = imagePath.replace('assets/earings/', '');
-                const letter = ['a', 'b', 'c', 'd', 'e'][i];
-                
-                const input = document.getElementById(`image-${letter}`);
-                if (input) {
-                    input.value = imageName;
-                    updateImagePreview(imageName, document.getElementById(`preview-${letter}`));
-                }
+        // Clear all image inputs first
+        ['a', 'b', 'c', 'd', 'e'].forEach(letter => {
+            const input = document.getElementById(`image-${letter}`);
+            const preview = document.getElementById(`preview-${letter}`);
+            if (input) input.value = '';
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="image-placeholder">
+                        <i class="fas fa-image"></i><br>
+                        No Image
+                    </div>
+                `;
             }
+        });
+        
+        // Fill image inputs with existing images
+        if (earing.images && earing.images.length > 0) {
+            earing.images.forEach((imagePath, index) => {
+                if (index < 5) {
+                    const letter = ['a', 'b', 'c', 'd', 'e'][index];
+                    const input = document.getElementById(`image-${letter}`);
+                    const preview = document.getElementById(`preview-${letter}`);
+                    
+                    if (input && preview) {
+                        // Extract just the filename
+                        const fileName = imagePath.split('/').pop();
+                        input.value = fileName;
+                        updateImagePreview(fileName, preview);
+                    }
+                }
+            });
         }
         
         // Switch to add tab
         document.querySelector('[data-tab="add-earing"]').click();
         
         // Show message
-        showNotification(`Editing "${earing.name}" - make changes and save to update.`, 'success');
+        showNotification(`✏️ Editing "${earing.name}" - Make changes and click "Update Earring"`, 'info');
         
         // Scroll to form
         document.getElementById('earing-form').scrollIntoView({ behavior: 'smooth' });
     }
     
+    function setEditMode(isEditing) {
+        const saveBtn = document.querySelector('.btn-save');
+        if (saveBtn) {
+            saveBtn.innerHTML = isEditing ? 
+                '<i class="fas fa-save"></i> Update Earring' : 
+                '<i class="fas fa-save"></i> Save Earring';
+        }
+        
+        if (editStatus) {
+            editStatus.style.display = isEditing ? 'block' : 'none';
+        }
+        
+        if (cancelEditBtn) {
+            cancelEditBtn.style.display = isEditing ? 'inline-block' : 'none';
+        }
+    }
+    
+    function clearEditState() {
+        editingId = null;
+        setEditMode(false);
+    }
+    
     function deleteEaring(id) {
         if (!confirm('Are you sure you want to delete this earring?')) return;
         
+        const beforeLength = earings.length;
         earings = earings.filter(e => e.id !== id);
-        saveEaringsToStorage(earings);
+        
+        if (earings.length === beforeLength) {
+            showNotification('Earring not found.', 'error');
+            return;
+        }
+        
+        // Save updated array
+        localStorage.setItem('jfEarings', JSON.stringify(earings));
+        
         loadEaringsList();
         updateJSONOutput();
         
-        showNotification('Earring deleted successfully!', 'success');
+        showNotification('🗑️ Earring deleted successfully!', 'success');
     }
     
     function updateJSONOutput() {
@@ -314,63 +510,73 @@ function initAdminForm() {
             earings: earings
         };
         jsonOutput.value = JSON.stringify(jsonData, null, 2);
+        console.log('JSON output updated');
     }
     
     function copyJSON() {
+        if (!jsonOutput.value.trim()) {
+            showNotification('No data to copy.', 'error');
+            return;
+        }
+        
         jsonOutput.select();
-        document.execCommand('copy');
-        showNotification('JSON copied to clipboard!', 'success');
+        jsonOutput.setSelectionRange(0, 99999);
+        
+        try {
+            document.execCommand('copy');
+            showNotification('📋 JSON copied to clipboard!', 'success');
+        } catch (error) {
+            console.error('Copy failed:', error);
+            showNotification('Copy failed. Please select and copy manually.', 'error');
+        }
     }
     
     function downloadJSON() {
+        if (!jsonOutput.value.trim()) {
+            showNotification('No data to download.', 'error');
+            return;
+        }
+        
         const jsonData = {
-            earings: earings
+            earings: earings,
+            exported: new Date().toISOString(),
+            count: earings.length
         };
+        
         const dataStr = JSON.stringify(jsonData, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
         
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', 'earings-data.json');
+        linkElement.setAttribute('download', `earings-data-${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(linkElement);
         linkElement.click();
+        document.body.removeChild(linkElement);
         
-        showNotification('JSON file downloaded!', 'success');
+        showNotification('💾 JSON file downloaded!', 'success');
     }
     
-    function loadEaringsFromStorage() {
-        // Try to load from localStorage
-        try {
-            const saved = localStorage.getItem('jfEarings');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                console.log('Loaded from localStorage:', parsed.length, 'earings');
-                return parsed;
-            }
-        } catch (error) {
-            console.error('Error loading from localStorage:', error);
+    function getImageUrl(imageName) {
+        if (!imageName || imageName === 'default.jpg') {
+            return 'https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
         }
         
-        console.log('No data in localStorage, returning empty array');
-        return [];
-    }
-    
-    function saveEaringsToStorage(earingsData) {
-        try {
-            localStorage.setItem('jfEarings', JSON.stringify(earingsData));
-            console.log('Saved to localStorage:', earingsData.length, 'earings');
-            updateJSONOutput();
-        } catch (error) {
-            console.error('Error saving to localStorage:', error);
-            showNotification('Error saving data. Please try again.', 'error');
+        // Check if it's already a URL
+        if (imageName.startsWith('http')) {
+            return imageName;
         }
-    }
-    
-    function getDefaultImage() {
-        return 'https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
+        
+        // Assume it's a local image
+        return `assets/earings/${imageName}`;
     }
     
     function showNotification(message, type = 'info') {
         const notification = document.getElementById('notification');
+        if (!notification) {
+            console.log('Notification would show:', message);
+            return;
+        }
+        
         notification.textContent = message;
         notification.className = 'notification';
         notification.classList.add(type, 'show');
@@ -379,4 +585,84 @@ function initAdminForm() {
             notification.classList.remove('show');
         }, 3000);
     }
+    
+    // Helper function to create cancel button if not in HTML
+    function createCancelButton() {
+        const formActions = document.querySelector('.form-actions');
+        if (!formActions) return null;
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.id = 'cancel-edit-btn';
+        cancelBtn.className = 'btn-secondary';
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
+        cancelBtn.style.display = 'none';
+        
+        formActions.appendChild(cancelBtn);
+        return cancelBtn;
+    }
+    
+    // Helper function to create edit status if not in HTML
+    function createEditStatus() {
+        const form = document.getElementById('earing-form');
+        if (!form) return null;
+        
+        const editStatus = document.createElement('div');
+        editStatus.id = 'edit-status';
+        editStatus.style.display = 'none';
+        editStatus.style.background = '#e3f2fd';
+        editStatus.style.padding = '10px';
+        editStatus.style.borderRadius = '5px';
+        editStatus.style.marginBottom = '15px';
+        editStatus.style.borderLeft = '4px solid #2196F3';
+        editStatus.innerHTML = '<i class="fas fa-edit"></i> <strong>Editing Mode:</strong> You are editing an existing earring. Click "Update Earring" to save changes.';
+        
+        form.insertBefore(editStatus, form.firstChild);
+        return editStatus;
+    }
+    
+    // Debug helper functions
+    window.debugAdmin = {
+        clearData: function() {
+            localStorage.removeItem('jfEarings');
+            earings = [];
+            loadEaringsList();
+            updateJSONOutput();
+            showNotification('Data cleared', 'info');
+        },
+        showData: function() {
+            console.log('Current earings:', earings);
+            console.log('localStorage:', JSON.parse(localStorage.getItem('jfEarings') || '[]'));
+            console.log('Editing ID:', editingId);
+        },
+        addSample: function() {
+            const sampleEaring = {
+                id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
+                name: "Sample Earring " + (earings.length + 1),
+                price: "₱299",
+                description: "This is a sample earring for testing.",
+                material: "Test Material",
+                size: "2.5 cm",
+                weight: "Lightweight",
+                closure: "Butterfly Back",
+                hypoallergenic: "Yes",
+                care: "Keep dry and clean",
+                category: "stud",
+                popularity: 3,
+                inStock: true,
+                images: ["earing" + (earings.length + 1) + "a.jpg"]
+            };
+            
+            earings.push(sampleEaring);
+            localStorage.setItem('jfEarings', JSON.stringify(earings));
+            loadEaringsList();
+            updateJSONOutput();
+            showNotification('Sample added', 'success');
+        }
+    };
+    
+    console.log('Admin form ready. Debug commands available:');
+    console.log('- debugAdmin.clearData() - Clear all earings');
+    console.log('- debugAdmin.showData() - Show current data');
+    console.log('- debugAdmin.addSample() - Add sample earring');
 }
