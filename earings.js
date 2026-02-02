@@ -20,27 +20,78 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function loadEaringsData() {
-    // First try to load from localStorage (admin saves here)
-    const saved = localStorage.getItem('jfEarings');
-    if (saved) {
-        console.log('Loading earings from localStorage');
-        const data = JSON.parse(saved);
-        return Array.isArray(data) ? data : [];
+    console.log('=== LOAD EARRINGS DATA START ===');
+    
+    // FIRST: Try to load from JSON file (primary source)
+    console.log('Loading earings from JSON file (primary source)...');
+    try {
+        const response = await fetch('earings-data.json');
+        console.log('JSON fetch response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const text = await response.text();
+        console.log('JSON file loaded successfully');
+        
+        const data = JSON.parse(text);
+        console.log('Parsed JSON data structure:', data);
+        
+        if (data && data.earings && Array.isArray(data.earings)) {
+            console.log(`✅ Loaded ${data.earings.length} earings from JSON file`);
+            
+            // Save to localStorage for backup
+            localStorage.setItem('jfEarings', JSON.stringify({ earings: data.earings }));
+            console.log('Saved JSON data to localStorage as backup');
+            
+            return data.earings;
+        } else if (Array.isArray(data)) {
+            console.log(`✅ Loaded ${data.length} earings from JSON file (array format)`);
+            
+            // Save to localStorage for backup
+            localStorage.setItem('jfEarings', JSON.stringify({ earings: data }));
+            console.log('Saved JSON data to localStorage as backup');
+            
+            return data;
+        } else {
+            console.warn('⚠️ JSON file has invalid format, checking localStorage...');
+            throw new Error('Invalid JSON format');
+        }
+    } catch (error) {
+        console.error('❌ Failed to load JSON file:', error.message);
+        console.log('Falling back to localStorage...');
     }
     
-    // Fallback to JSON file
-    try {
-        console.log('Loading earings from JSON file');
-        const response = await fetch('earings-data.json');
-        if (!response.ok) throw new Error('Failed to load JSON file');
-        const data = await response.json();
-        return data.earings || [];
-    } catch (error) {
-        console.log('Using default earings data');
-        return getDefaultEarings();
+    // SECOND: Fallback to localStorage if JSON fails
+    const saved = localStorage.getItem('jfEarings');
+    console.log('Checking localStorage:', saved ? 'Data found' : 'Empty');
+    
+    if (saved && saved !== 'null' && saved !== 'undefined') {
+        console.log('Loading from localStorage (fallback)...');
+        try {
+            const data = JSON.parse(saved);
+            console.log('Parsed localStorage data:', data);
+            
+            if (Array.isArray(data)) {
+                console.log(`✅ Loaded ${data.length} earings from localStorage (array format)`);
+                return data;
+            } else if (data && data.earings && Array.isArray(data.earings)) {
+                console.log(`✅ Loaded ${data.earings.length} earings from localStorage (object format)`);
+                return data.earings;
+            } else {
+                console.warn('⚠️ localStorage has invalid format');
+                throw new Error('Invalid localStorage format');
+            }
+        } catch (error) {
+            console.error('❌ Error parsing localStorage:', error);
+        }
     }
+    
+    // THIRD: Last resort - use default earings
+    console.log('Both JSON file and localStorage failed, using default earings');
+    return getDefaultEarings();
 }
-
 function getDefaultEarings() {
     return [
         {
