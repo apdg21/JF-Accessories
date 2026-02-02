@@ -1,4 +1,4 @@
-// Admin Form JavaScript
+// Admin Form JavaScript - Simplified with fixed save
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.querySelector('.admin-form-page')) return;
     
@@ -37,8 +37,6 @@ function initAdminForm() {
     
     // Form elements
     const form = document.getElementById('earing-form');
-    const imageBaseNameInput = document.getElementById('image-base-name');
-    const imagesPreview = document.getElementById('images-preview');
     const jsonOutput = document.getElementById('json-output');
     const copyJsonBtn = document.getElementById('copy-json-btn');
     const downloadJsonBtn = document.getElementById('download-json-btn');
@@ -46,18 +44,14 @@ function initAdminForm() {
     // Initialize earings data
     let earings = loadEaringsFromStorage();
     
-    // Generate image previews when base name changes
-    imageBaseNameInput.addEventListener('input', updateImagePreviews);
+    // Set up image previews
+    setupImagePreviews();
     
     // Form submission
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        console.log('Form submitted');
         saveEaring();
-    });
-    
-    // Form reset
-    form.addEventListener('reset', function() {
-        imagesPreview.innerHTML = '';
     });
     
     // Copy JSON button
@@ -67,61 +61,87 @@ function initAdminForm() {
     downloadJsonBtn.addEventListener('click', downloadJSON);
     
     // Initial load
-    updateImagePreviews();
     loadEaringsList();
+    updateJSONOutput();
     
     // Functions
-    function updateImagePreviews() {
-        const baseName = imageBaseNameInput.value.trim();
-        imagesPreview.innerHTML = '';
+    function setupImagePreviews() {
+        // Setup preview for each image input
+        const imageInputs = ['a', 'b', 'c', 'd', 'e'];
         
-        if (!baseName) return;
-        
-        // Generate up to 5 image previews (a-e)
-        const letters = ['a', 'b', 'c', 'd', 'e'];
-        
-        letters.forEach(letter => {
-            const imageName = `${baseName}${letter}.jpg`;
-            const imagePath = `assets/earings/${imageName}`;
+        imageInputs.forEach(letter => {
+            const input = document.getElementById(`image-${letter}`);
+            const preview = document.getElementById(`preview-${letter}`);
             
-            const imageItem = document.createElement('div');
-            imageItem.className = 'image-item';
-            
-            // Check if image exists (using placeholder for demo)
-            const img = new Image();
-            img.src = imagePath;
-            
-            img.onload = function() {
-                imageItem.innerHTML = `
-                    <img src="${imagePath}" class="image-preview" alt="${imageName}">
-                    <button class="remove-image" title="Remove image">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-            };
-            
-            img.onerror = function() {
-                imageItem.innerHTML = `
-                    <div class="image-placeholder">
-                        <i class="fas fa-image"></i>
-                        <span>${imageName}</span>
-                        <small>(Image not found)</small>
-                    </div>
-                    <button class="remove-image" title="Remove image">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-            };
-            
-            imagesPreview.appendChild(imageItem);
+            if (input && preview) {
+                input.addEventListener('input', function() {
+                    updateImagePreview(this.value, preview);
+                });
+            }
         });
     }
     
+    function updateImagePreview(imageName, previewElement) {
+        if (!imageName || imageName.trim() === '') {
+            previewElement.innerHTML = `
+                <div class="image-placeholder">
+                    <i class="fas fa-image"></i><br>
+                    No Image
+                </div>
+            `;
+            return;
+        }
+        
+        // For local testing, we'll use a placeholder
+        // In production, this would check the actual file
+        const img = new Image();
+        const testPath = `assets/earings/${imageName}`;
+        
+        img.onload = function() {
+            previewElement.innerHTML = `<img src="${testPath}" class="image-preview" alt="${imageName}">`;
+        };
+        
+        img.onerror = function() {
+            previewElement.innerHTML = `
+                <div class="image-placeholder">
+                    <i class="fas fa-question-circle"></i><br>
+                    ${imageName}<br>
+                    <small>(File not found)</small>
+                </div>
+            `;
+        };
+        
+        img.src = testPath;
+    }
+    
     function saveEaring() {
-        // Get form values
+        console.log('Starting save process...');
+        
+        // Get form values - only name, price, description are required
         const name = document.getElementById('earing-name').value.trim();
         const price = document.getElementById('earing-price').value.trim();
         const description = document.getElementById('earing-description').value.trim();
+        
+        // Validate required fields
+        if (!name) {
+            showNotification('Please enter an earring name.', 'error');
+            document.getElementById('earing-name').focus();
+            return;
+        }
+        
+        if (!price) {
+            showNotification('Please enter a price.', 'error');
+            document.getElementById('earing-price').focus();
+            return;
+        }
+        
+        if (!description) {
+            showNotification('Please enter a description.', 'error');
+            document.getElementById('earing-description').focus();
+            return;
+        }
+        
+        // Get optional fields
         const material = document.getElementById('earing-material').value.trim();
         const size = document.getElementById('earing-size').value.trim();
         const weight = document.getElementById('earing-weight').value.trim();
@@ -129,43 +149,40 @@ function initAdminForm() {
         const hypoallergenic = document.getElementById('earing-hypoallergenic').value;
         const care = document.getElementById('earing-care').value.trim();
         const category = document.getElementById('earing-category').value;
-        const baseName = document.getElementById('image-base-name').value.trim();
         
-        // Validate required fields
-        if (!name || !price || !description || !material || !size || !category || !baseName) {
-            showNotification('Please fill in all required fields.', 'error');
-            return;
-        }
-        
-        // Generate image array based on base name
+        // Get image filenames
         const images = [];
-        const letters = ['a', 'b', 'c', 'd', 'e'];
+        const imageLetters = ['a', 'b', 'c', 'd', 'e'];
         
-        letters.forEach(letter => {
-            const imageName = `${baseName}${letter}.jpg`;
-            images.push(`assets/earings/${imageName}`);
+        imageLetters.forEach(letter => {
+            const imageInput = document.getElementById(`image-${letter}`);
+            const imageName = imageInput ? imageInput.value.trim() : '';
+            
+            if (imageName) {
+                // Add the full path for the image
+                images.push(`assets/earings/${imageName}`);
+            }
         });
         
-        // Create new earring object
+        // Create new earring object with sensible defaults
         const newEaring = {
             id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
-            name,
-            price,
-            description,
-            material,
-            size,
+            name: name,
+            price: price,
+            description: description,
+            material: material || 'Not specified',
+            size: size || 'Not specified',
             weight: weight || '',
-            closure,
-            hypoallergenic,
-            care: care || '',
-            category,
+            closure: closure || 'Butterfly Back',
+            hypoallergenic: hypoallergenic || 'Yes',
+            care: care || 'Keep dry and clean',
+            category: category || 'stud',
             popularity: 3, // Default popularity
             inStock: true,
-            images: images.filter(img => {
-                // Remove images that don't exist (optional)
-                return true; // For now, include all
-            })
+            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80']
         };
+        
+        console.log('New earring object:', newEaring);
         
         // Add to earings array
         earings.push(newEaring);
@@ -175,19 +192,24 @@ function initAdminForm() {
         
         // Reset form
         form.reset();
-        imagesPreview.innerHTML = '';
+        
+        // Update views
+        loadEaringsList();
+        updateJSONOutput();
         
         // Show success message
         showNotification(`"${name}" added successfully!`, 'success');
         
         // Switch to view tab
-        document.querySelector('[data-tab="view-earings"]').click();
+        setTimeout(() => {
+            document.querySelector('[data-tab="view-earings"]').click();
+        }, 1000);
     }
     
     function loadEaringsList() {
         const container = document.getElementById('earings-list-container');
         
-        if (earings.length === 0) {
+        if (!earings || earings.length === 0) {
             container.innerHTML = '<p>No earrings found. Add your first earring!</p>';
             return;
         }
@@ -196,7 +218,7 @@ function initAdminForm() {
             <div class="earings-list">
                 ${earings.map(earing => `
                     <div class="earing-item" data-id="${earing.id}">
-                        <div class="earing-image" style="background-image: url('${earing.images[0] || 'https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}')"></div>
+                        <div class="earing-image" style="background-image: url('${earing.images[0] || getDefaultImage()}')"></div>
                         <div class="earing-info">
                             <h3 class="earing-name">${earing.name}</h3>
                             <p class="earing-price">${earing.price}</p>
@@ -250,12 +272,20 @@ function initAdminForm() {
         document.getElementById('earing-care').value = earing.care;
         document.getElementById('earing-category').value = earing.category;
         
-        // Extract base name from first image
+        // Fill image inputs
         if (earing.images && earing.images.length > 0) {
-            const firstImage = earing.images[0];
-            const baseName = firstImage.replace('assets/earings/', '').replace('a.jpg', '');
-            document.getElementById('image-base-name').value = baseName;
-            updateImagePreviews();
+            // Extract just the filenames from the paths
+            for (let i = 0; i < Math.min(earing.images.length, 5); i++) {
+                const imagePath = earing.images[i];
+                const imageName = imagePath.replace('assets/earings/', '');
+                const letter = ['a', 'b', 'c', 'd', 'e'][i];
+                
+                const input = document.getElementById(`image-${letter}`);
+                if (input) {
+                    input.value = imageName;
+                    updateImagePreview(imageName, document.getElementById(`preview-${letter}`));
+                }
+            }
         }
         
         // Switch to add tab
@@ -309,31 +339,34 @@ function initAdminForm() {
     
     function loadEaringsFromStorage() {
         // Try to load from localStorage
-        const saved = localStorage.getItem('jfEarings');
-        if (saved) {
-            return JSON.parse(saved);
-        }
-        
-        // Try to load from JSON file
-        return fetchEaringsData();
-    }
-    
-    async function fetchEaringsData() {
         try {
-            const response = await fetch('earings-data.json');
-            if (response.ok) {
-                const data = await response.json();
-                return data.earings || [];
+            const saved = localStorage.getItem('jfEarings');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                console.log('Loaded from localStorage:', parsed.length, 'earings');
+                return parsed;
             }
         } catch (error) {
-            console.log('Could not load JSON file:', error);
+            console.error('Error loading from localStorage:', error);
         }
+        
+        console.log('No data in localStorage, returning empty array');
         return [];
     }
     
     function saveEaringsToStorage(earingsData) {
-        localStorage.setItem('jfEarings', JSON.stringify(earingsData));
-        updateJSONOutput();
+        try {
+            localStorage.setItem('jfEarings', JSON.stringify(earingsData));
+            console.log('Saved to localStorage:', earingsData.length, 'earings');
+            updateJSONOutput();
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+            showNotification('Error saving data. Please try again.', 'error');
+        }
+    }
+    
+    function getDefaultImage() {
+        return 'https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
     }
     
     function showNotification(message, type = 'info') {
