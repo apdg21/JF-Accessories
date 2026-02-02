@@ -1,0 +1,364 @@
+{
+  "earings": [
+    {
+      "id": 1,
+      "name": "JF Earing - 1",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing1a.jpg"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "JF Earing - 2",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing2a.jpg"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "JF Earing - 3",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing3a.jpg"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "JF Earing - 4",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing4a.jpg"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "JF Earing - 5",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing5a.jpg"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "JF Earing - 6",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing6a.jpg"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "JF Earing - 7",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing7a.jpg"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "JF Earing - 8",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing8a.jpg"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "JF Earing - 9",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing9a.jpg"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "JF Earing - 10",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing10a.jpg"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "JF Earing - 11",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing11a.jpg"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "JF Earing - 12",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing12a.jpg"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "JF Earing - 13",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing13a.jpg"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "JF Earing - 14",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing14a.jpg"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "JF Earing - 15",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing15a.jpg"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "JF Earing - 16",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing16a.jpg"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "JF Earing - 17",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing17a.jpg"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "JF Earing - 18",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing18a.jpg"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "JF Earing - 19",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing19a.jpg"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "JF Earing - 20",
+      "price": "₱150",
+      "description": "Earrings are hypoallergenic as they all have S925 silver pins. Items are made of gold vermeil and S925 silver pin. Designs last upto 6 months before they change their color, it could last up to more than a year with proper care.",
+      "material": "gold vermeil and S925 silver pin",
+      "size": "Not specified",
+      "weight": "",
+      "closure": "Push Back",
+      "hypoallergenic": "Yes",
+      "care": "Keep dry and clean",
+      "category": "stud",
+      "popularity": 3,
+      "inStock": true,
+      "images": [
+        "earing20a.jpg"
+      ]
+    }
+  ]
+}
