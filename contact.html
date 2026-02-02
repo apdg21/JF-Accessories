@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - JF Accessories</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header will be loaded via JavaScript -->
+    <div id="header-container"></div>
+
+    <main>
+        <!-- Contact Hero Section -->
+        <section class="contact-hero">
+            <div class="container">
+                <h1 class="page-title">Contact Us</h1>
+                <p class="page-subtitle">We'd love to hear from you!</p>
+            </div>
+        </section>
+
+        <!-- Contact Content -->
+        <section class="contact-content">
+            <div class="container">
+                <div class="contact-grid">
+                    <!-- Contact Form -->
+                    <div class="contact-form-section">
+                        <h2>Send Us a Message</h2>
+                        <p>Have questions about our products or need help with an order? Send us a message and we'll get back to you as soon as possible.</p>
+                        
+                        <form class="contact-form" action="https://formsubmit.co/aguilarjean42@gmail.com" method="POST">
+                            <!-- FormSubmit Configuration -->
+                            <input type="hidden" name="_subject" value="New Contact Form Submission - JF Accessories">
+                            <input type="hidden" name="_template" value="table">
+                            <input type="hidden" name="_captcha" value="false">
+                            <input type="hidden" name="_next" value="https://yourwebsite.com/thank-you.html"> <!-- Update with your actual thank you page URL -->
+                            
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" required placeholder="Your full name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required placeholder="you@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="+63 XXX XXX XXXX">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject">Subject *</label>
+                                <select id="subject" name="_subject" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="Order Inquiry">Order Inquiry</option>
+                                    <option value="Product Question">Product Question</option>
+                                    <option value="Custom Order Request">Custom Order Request</option>
+                                    <option value="Shipping Question">Shipping Question</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Message *</label>
+                                <textarea id="message" name="message" rows="6" required placeholder="Tell us how we can help you..."></textarea>
+                            </div>
+                            
+                            <div class="form-footer">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Send Message
+                                </button>
+                                <p class="form-note">* Required fields</p>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div class="contact-info-section">
+                        <h2>Get in Touch</h2>
+                        <p>We're here to help you with any questions about our products, orders, or custom requests.</p>
+                        
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="method-details">
+                                    <h3>Email Us</h3>
+                                    <p><a href="mailto:aguilarjean42@gmail.com">aguilarjean42@gmail.com</a></p>
+                                    <p class="method-note">We typically respond within 24 hours</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fab fa-facebook-messenger"></i>
+                                </div>
+                                <div class="method-details">
+                                    <h3>Message on Facebook</h3>
+                                    <p><a href="https://facebook.com" target="_blank">@JF Accessories</a></p>
+                                    <p class="method-note">Fastest way to get in touch</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="method-details">
+                                    <h3>Response Time</h3>
+                                    <p>Monday - Saturday: 9AM - 8PM</p>
+                                    <p class="method-note">We'll respond as quickly as possible</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Order FAQ -->
+                        <div class="order-faq">
+                            <h3>Ordering Information</h3>
+                            <ul>
+                                <li><strong>Payment:</strong> GCash only</li>
+                                <li><strong>Shipping:</strong> Nationwide via LBC or J&T</li>
+                                <li><strong>Processing Time:</strong> 1-2 business days</li>
+                                <li><strong>Delivery Time:</strong> 3-5 business days</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer will be loaded via JavaScript -->
+    <div id="footer-container"></div>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-header">
+            <h4>Order Inquiry</h4>
+            <button class="close-chat"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-body">
+            <div class="chat-messages">
+                <div class="message bot">
+                    <p>Hello! I'm Jean from JF Accessories. How can I help you with your order?</p>
+                </div>
+            </div>
+            <div class="chat-input">
+                <textarea placeholder="Type your message here..."></textarea>
+                <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button class="chat-toggle">
+            <i class="fas fa-shopping-cart"></i> Order Help
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
