@@ -11,6 +11,7 @@ function initAdminForm() {
     // Initialize earings data and editing state
     let earings = [];
     let editingId = null;
+    let draggedItem = null;
     
     // Load data immediately
     loadInitialData().then(data => {
@@ -215,9 +216,9 @@ function initAdminForm() {
             // Find and update existing earring
             const index = earings.findIndex(e => e.id === editingId);
             if (index !== -1) {
-                // Keep the original ID and other properties
+                // Update the existing earring
                 earings[index] = {
-                    ...earings[index], // Keep original properties
+                    ...earings[index],
                     name,
                     price,
                     description,
@@ -233,33 +234,30 @@ function initAdminForm() {
                 
                 console.log('Updated earring at index:', index);
                 showNotification(`✅ "${name}" updated successfully!`, 'success');
+                
+                // Save to localStorage
+                localStorage.setItem('jfEarings', JSON.stringify(earings));
+                
+                // Reset form
+                form.reset();
+                clearEditState();
+                
+                // Update views
+                loadEaringsList();
+                updateJSONOutput();
+                
+                // Switch to view tab after delay
+                setTimeout(() => {
+                    document.querySelector('[data-tab="view-earings"]').click();
+                }, 1000);
             } else {
                 showNotification('Earring not found. Creating new one.', 'info');
-                // Create new earring instead
-                editingId = null;
                 createNewEaring(name, price, description, material, size, weight, closure, hypoallergenic, care, category, images);
-                return;
             }
         } else {
             console.log('CREATING new earring');
             createNewEaring(name, price, description, material, size, weight, closure, hypoallergenic, care, category, images);
         }
-        
-        // Save to localStorage
-        localStorage.setItem('jfEarings', JSON.stringify(earings));
-        
-        // Reset form
-        form.reset();
-        clearEditState();
-        
-        // Update views
-        loadEaringsList();
-        updateJSONOutput();
-        
-        // Switch to view tab after delay
-        setTimeout(() => {
-            document.querySelector('[data-tab="view-earings"]').click();
-        }, 1000);
         
         console.log('=== SAVE COMPLETE ===');
     }
@@ -288,6 +286,22 @@ function initAdminForm() {
         earings.push(newEaring);
         console.log('Added new earring. Total:', earings.length);
         showNotification(`✅ "${name}" added successfully!`, 'success');
+        
+        // Save to localStorage
+        localStorage.setItem('jfEarings', JSON.stringify(earings));
+        
+        // Reset form
+        form.reset();
+        clearEditState();
+        
+        // Update views
+        loadEaringsList();
+        updateJSONOutput();
+        
+        // Switch to view tab after delay
+        setTimeout(() => {
+            document.querySelector('[data-tab="view-earings"]').click();
+        }, 1000);
     }
     
     function loadEaringsList() {
@@ -306,13 +320,14 @@ function initAdminForm() {
         }
         
         container.innerHTML = `
-            <div class="earings-list">
-                ${earings.map(earing => `
-                    <div class="earing-item">
+            <div class="earings-list" id="sortable-earings-list">
+                ${earings.map((earing, index) => `
+                    <div class="earing-item" draggable="true" data-index="${index}" data-id="${earing.id}">
                         <div class="earing-image" style="background-image: url('${getImageUrl(earing.images[0])}')"></div>
                         <div class="earing-info">
                             <h3 class="earing-name">${earing.name}</h3>
                             <p class="earing-price">${earing.price}</p>
+                            <p class="earing-index"><small>Position: ${index + 1}</small></p>
                             <div class="earing-actions">
                                 <button class="btn-edit" data-id="${earing.id}">
                                     <i class="fas fa-edit"></i> Edit
@@ -322,8 +337,14 @@ function initAdminForm() {
                                 </button>
                             </div>
                         </div>
+                        <div class="drag-handle">
+                            <i class="fas fa-arrows-alt"></i>
+                        </div>
                     </div>
                 `).join('')}
+            </div>
+            <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <p><strong>Drag & Drop:</strong> Drag items to reorder them. Changes save automatically.</p>
             </div>
         `;
         
@@ -342,6 +363,95 @@ function initAdminForm() {
                     deleteEaring(id);
                 }
             });
+        });
+        
+        // Setup drag and drop
+        setupDragAndDrop();
+    }
+    
+    function setupDragAndDrop() {
+        const container = document.getElementById('sortable-earings-list');
+        if (!container) return;
+        
+        const items = container.querySelectorAll('.earing-item');
+        
+        items.forEach(item => {
+            // Drag start
+            item.addEventListener('dragstart', (e) => {
+                draggedItem = item;
+                setTimeout(() => {
+                    item.style.opacity = '0.4';
+                }, 0);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            
+            // Drag end
+            item.addEventListener('dragend', (e) => {
+                setTimeout(() => {
+                    draggedItem.style.opacity = '1';
+                    draggedItem = null;
+                }, 0);
+                
+                // Update positions after drop
+                updatePositionsAfterDrag();
+            });
+            
+            // Drag over
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+            
+            // Drag enter
+            item.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                if (draggedItem && item !== draggedItem) {
+                    item.style.border = '2px dashed #3498db';
+                    item.style.boxShadow = '0 0 10px rgba(52, 152, 219, 0.3)';
+                }
+            });
+            
+            // Drag leave
+            item.addEventListener('dragleave', (e) => {
+                if (draggedItem && item !== draggedItem) {
+                    item.style.border = '1px solid #eee';
+                    item.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
+                }
+            });
+            
+            // Drop
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (draggedItem && item !== draggedItem) {
+                    item.style.border = '1px solid #eee';
+                    item.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
+                    
+                    // Get indices
+                    const fromIndex = parseInt(draggedItem.getAttribute('data-index'));
+                    const toIndex = parseInt(item.getAttribute('data-index'));
+                    
+                    // Reorder array
+                    const [movedItem] = earings.splice(fromIndex, 1);
+                    earings.splice(toIndex, 0, movedItem);
+                    
+                    // Save and reload
+                    localStorage.setItem('jfEarings', JSON.stringify(earings));
+                    loadEaringsList();
+                    updateJSONOutput();
+                    showNotification('Order updated!', 'success');
+                }
+            });
+        });
+    }
+    
+    function updatePositionsAfterDrag() {
+        const items = document.querySelectorAll('.earing-item');
+        items.forEach((item, index) => {
+            item.setAttribute('data-index', index);
+            const indexElement = item.querySelector('.earing-index');
+            if (indexElement) {
+                indexElement.innerHTML = `<small>Position: ${index + 1}</small>`;
+            }
         });
     }
     
@@ -445,12 +555,8 @@ function initAdminForm() {
         if (saveBtn) {
             if (isEditing) {
                 saveBtn.innerHTML = '<i class="fas fa-save"></i> Update Earring';
-                saveBtn.classList.add('btn-update');
-                saveBtn.classList.remove('btn-save');
             } else {
                 saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Earring';
-                saveBtn.classList.remove('btn-update');
-                saveBtn.classList.add('btn-save');
             }
         }
         
