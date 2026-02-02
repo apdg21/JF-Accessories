@@ -1,4 +1,4 @@
-// Admin Form JavaScript - Simplified with working Edit
+// Admin Form JavaScript - Fixed with your suggestions
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.querySelector('.admin-form-page')) return;
     
@@ -12,6 +12,9 @@ function initAdminForm() {
     let earings = [];
     let editingId = null;
     
+    // DOM Elements - ONLY get form here, get buttons dynamically
+    const form = document.getElementById('earing-form');
+    
     // Load data immediately
     loadInitialData().then(data => {
         earings = data;
@@ -20,30 +23,12 @@ function initAdminForm() {
         updateJSONOutput();
     });
     
-    // DOM Elements
-    const form = document.getElementById('earing-form');
-    const saveBtn = document.querySelector('.btn-save');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const editStatus = document.getElementById('edit-status');
-    const jsonOutput = document.getElementById('json-output');
-    
-    // Check if elements exist
-    if (!form || !saveBtn) {
-        console.error('Form or Save button not found!');
-        return;
-    }
-    
-    console.log('Save button found:', saveBtn);
-    console.log('Cancel button found:', cancelEditBtn);
-    console.log('Edit status found:', editStatus);
-    
     // Tab functionality
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     
     tabButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
+        button.addEventListener('click', () => {
             const tabId = button.getAttribute('data-tab');
             
             // Clear editing state when switching tabs
@@ -78,27 +63,35 @@ function initAdminForm() {
         saveEaring();
     });
     
-    // Cancel edit button
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', function() {
-            console.log('Cancel edit clicked');
-            clearEditState();
-            form.reset();
-            showNotification('Edit cancelled.', 'info');
-        });
-    }
-    
     // Form reset
     form.addEventListener('reset', function() {
         console.log('Form reset');
         clearEditState();
     });
     
-    // Copy JSON button
-    document.getElementById('copy-json-btn').addEventListener('click', copyJSON);
-    
-    // Download JSON button
-    document.getElementById('download-json-btn').addEventListener('click', downloadJSON);
+    // Event delegation for dynamically added buttons
+    document.addEventListener('click', function(e) {
+        // Cancel edit button
+        if (e.target.id === 'cancel-edit-btn' || e.target.closest('#cancel-edit-btn')) {
+            e.preventDefault();
+            console.log('Cancel edit clicked');
+            clearEditState();
+            form.reset();
+            showNotification('Edit cancelled.', 'info');
+        }
+        
+        // Copy JSON button
+        if (e.target.id === 'copy-json-btn' || e.target.closest('#copy-json-btn')) {
+            e.preventDefault();
+            copyJSON();
+        }
+        
+        // Download JSON button
+        if (e.target.id === 'download-json-btn' || e.target.closest('#download-json-btn')) {
+            e.preventDefault();
+            downloadJSON();
+        }
+    });
     
     // Image preview setup
     setupImagePreviews();
@@ -176,6 +169,7 @@ function initAdminForm() {
     
     function saveEaring() {
         console.log('=== SAVE FUNCTION START ===');
+        console.log('Editing ID:', editingId);
         
         // Get form values
         const name = document.getElementById('earing-name').value.trim();
@@ -233,11 +227,16 @@ function initAdminForm() {
                 console.log('Updated earring at index:', index);
                 showNotification(`✅ "${name}" updated successfully!`, 'success');
             } else {
+                console.warn(`Cannot find earring with id ${editingId} — forcing new creation`);
                 showNotification('Earring not found. Creating new one.', 'error');
+                // Fall through to create new (don't recurse!)
                 editingId = null;
-                return saveEaring(); // Retry as new
+                // Continue to the create block below
             }
-        } else {
+        }
+        
+        // If not editing (or editing failed), create new
+        if (editingId === null) {
             console.log('CREATING new earring');
             
             // Create new earring
@@ -276,7 +275,10 @@ function initAdminForm() {
         
         // Switch to view tab after delay
         setTimeout(() => {
-            document.querySelector('[data-tab="view-earings"]').click();
+            const viewTab = document.querySelector('[data-tab="view-earings"]');
+            if (viewTab) {
+                viewTab.click();
+            }
         }, 1000);
         
         console.log('=== SAVE COMPLETE ===');
@@ -319,25 +321,26 @@ function initAdminForm() {
             </div>
         `;
         
-        // Add event listeners
-        container.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = parseInt(this.getAttribute('data-id'));
+        // Add event listeners using event delegation
+        container.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.btn-edit');
+            const deleteBtn = e.target.closest('.btn-delete');
+            
+            if (editBtn) {
+                const id = parseInt(editBtn.getAttribute('data-id'));
                 editEaring(id);
-            });
-        });
-        
-        container.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = parseInt(this.getAttribute('data-id'));
-                if (confirm('Delete this earring?')) {
+            }
+            
+            if (deleteBtn) {
+                const id = parseInt(deleteBtn.getAttribute('data-id'));
+                if (confirm('Are you sure you want to delete this earring?')) {
                     earings = earings.filter(e => e.id !== id);
                     localStorage.setItem('jfEarings', JSON.stringify(earings));
                     loadEaringsList();
                     updateJSONOutput();
-                    showNotification('Earring deleted.', 'success');
+                    showNotification('🗑️ Earring deleted successfully!', 'success');
                 }
-            });
+            }
         });
     }
     
@@ -348,8 +351,11 @@ function initAdminForm() {
         const earing = earings.find(e => e.id === id);
         if (!earing) {
             console.error('Earring not found');
+            showNotification('Earring not found.', 'error');
             return;
         }
+        
+        console.log('Found earring:', earing);
         
         // Set editing mode
         editingId = id;
@@ -357,7 +363,6 @@ function initAdminForm() {
         
         // Update UI for edit mode
         setEditMode(true);
-        console.log('Edit mode set to true');
         
         // Fill form
         document.getElementById('earing-name').value = earing.name || '';
@@ -397,8 +402,7 @@ function initAdminForm() {
                         const fileName = img.split('/').pop();
                         input.value = fileName;
                         // Trigger preview update
-                        const event = new Event('input');
-                        input.dispatchEvent(event);
+                        input.dispatchEvent(new Event('input'));
                     }
                 }
             });
@@ -412,31 +416,46 @@ function initAdminForm() {
             form.scrollIntoView({ behavior: 'smooth' });
         }, 100);
         
-        showNotification(`Editing "${earing.name}" - Make changes and click "Update Earring"`, 'info');
+        showNotification(`✏️ Editing "${earing.name}" - Make changes and click "Update Earring"`, 'info');
         console.log('=== EDIT FUNCTION END ===');
     }
     
     function setEditMode(isEditing) {
-        console.log('Setting edit mode to:', isEditing);
-        console.log('Save button:', saveBtn);
-        console.log('Save button innerHTML before:', saveBtn.innerHTML);
+        console.log('=== setEditMode called with:', isEditing);
         
-        if (saveBtn) {
-            saveBtn.innerHTML = isEditing ? 
-                '<i class="fas fa-save"></i> Update Earring' : 
-                '<i class="fas fa-save"></i> Save Earring';
-            console.log('Save button innerHTML after:', saveBtn.innerHTML);
+        // Look up elements EVERY TIME (key fix!)
+        const saveBtn = document.querySelector('.btn-save');
+        const editStatus = document.getElementById('edit-status');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        
+        console.log('Found saveBtn?', !!saveBtn);
+        console.log('Found editStatus?', !!editStatus);
+        console.log('Found cancelEditBtn?', !!cancelEditBtn);
+        
+        if (!saveBtn) {
+            console.error("❌ Save button (.btn-save) NOT found when trying to set edit mode!");
+            return;
         }
+        
+        console.log('Save button text before:', saveBtn.innerHTML);
+        
+        saveBtn.innerHTML = isEditing 
+            ? '<i class="fas fa-save"></i> Update Earring'
+            : '<i class="fas fa-save"></i> Save Earring';
+        
+        console.log('Save button text after:', saveBtn.innerHTML);
         
         if (editStatus) {
             editStatus.style.display = isEditing ? 'block' : 'none';
-            console.log('Edit status display:', editStatus.style.display);
+            console.log('Edit status display set to:', editStatus.style.display);
         }
         
         if (cancelEditBtn) {
             cancelEditBtn.style.display = isEditing ? 'inline-block' : 'none';
-            console.log('Cancel button display:', cancelEditBtn.style.display);
+            console.log('Cancel button display set to:', cancelEditBtn.style.display);
         }
+        
+        console.log('=== setEditMode completed ===');
     }
     
     function clearEditState() {
@@ -446,12 +465,14 @@ function initAdminForm() {
     }
     
     function updateJSONOutput() {
+        const jsonOutput = document.getElementById('json-output');
         if (!jsonOutput) return;
         const jsonData = { earings: earings };
         jsonOutput.value = JSON.stringify(jsonData, null, 2);
     }
     
     function copyJSON() {
+        const jsonOutput = document.getElementById('json-output');
         if (!jsonOutput || !jsonOutput.value.trim()) {
             showNotification('No data to copy.', 'error');
             return;
@@ -459,16 +480,22 @@ function initAdminForm() {
         
         jsonOutput.select();
         document.execCommand('copy');
-        showNotification('JSON copied to clipboard!', 'success');
+        showNotification('📋 JSON copied to clipboard!', 'success');
     }
     
     function downloadJSON() {
+        const jsonOutput = document.getElementById('json-output');
         if (!jsonOutput || !jsonOutput.value.trim()) {
             showNotification('No data to download.', 'error');
             return;
         }
         
-        const jsonData = { earings: earings };
+        const jsonData = { 
+            earings: earings,
+            exported: new Date().toISOString(),
+            count: earings.length
+        };
+        
         const dataStr = JSON.stringify(jsonData, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
         
@@ -479,7 +506,7 @@ function initAdminForm() {
         link.click();
         document.body.removeChild(link);
         
-        showNotification('JSON file downloaded!', 'success');
+        showNotification('💾 JSON file downloaded!', 'success');
     }
     
     function getImageUrl(imageName) {
@@ -491,7 +518,10 @@ function initAdminForm() {
     
     function showNotification(message, type = 'info') {
         const notification = document.getElementById('notification');
-        if (!notification) return;
+        if (!notification) {
+            console.log('Notification would show:', message);
+            return;
+        }
         
         notification.textContent = message;
         notification.className = `notification ${type} show`;
@@ -501,9 +531,31 @@ function initAdminForm() {
         }, 3000);
     }
     
-    // Debug
-    console.log('Admin form ready. Open console and check:');
-    console.log('1. Is saveBtn found?', !!saveBtn);
-    console.log('2. Is editStatus found?', !!editStatus);
-    console.log('3. Is cancelEditBtn found?', !!cancelEditBtn);
+    // Debug command
+    window.debugEdit = function() {
+        console.log('=== DEBUG INFO ===');
+        console.log('Current editingId:', editingId);
+        console.log('Total earings:', earings.length);
+        console.log('First earring ID (if any):', earings[0]?.id);
+        
+        // Test button lookup
+        const saveBtn = document.querySelector('.btn-save');
+        console.log('Save button found?', !!saveBtn);
+        console.log('Save button text:', saveBtn?.innerHTML);
+        
+        // Test edit status
+        const editStatus = document.getElementById('edit-status');
+        console.log('Edit status found?', !!editStatus);
+        console.log('Edit status display:', editStatus?.style.display);
+        
+        // Test cancel button
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        console.log('Cancel button found?', !!cancelBtn);
+        console.log('Cancel button display:', cancelBtn?.style.display);
+        
+        console.log('=== END DEBUG ===');
+    };
+    
+    console.log('✅ Admin form loaded successfully');
+    console.log('💡 Use debugEdit() in console to check button states');
 }
