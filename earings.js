@@ -24,7 +24,8 @@ async function loadEaringsData() {
     const saved = localStorage.getItem('jfEarings');
     if (saved) {
         console.log('Loading earings from localStorage');
-        return JSON.parse(saved);
+        const data = JSON.parse(saved);
+        return Array.isArray(data) ? data : [];
     }
     
     // Fallback to JSON file
@@ -62,423 +63,38 @@ function getDefaultEarings() {
                 "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
             ]
         },
-        {
-            id: 2,
-            name: "Gold Hoops",
-            price: "₱349",
-            description: "Classic gold hoops that never go out of style. Versatile enough for both casual and formal occasions.",
-            material: "18K Gold Plated Brass",
-            size: "3 cm diameter",
-            weight: "Medium weight (approx. 8g per pair)",
-            closure: "Hinged Snap Closure",
-            hypoallergenic: "Yes",
-            care: "Store in jewelry box, avoid scratching",
-            category: "hoop",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 3,
-            name: "Statement Studs",
-            price: "₱399",
-            description: "Bold statement studs that make a perfect accent to any outfit. Eye-catching and elegant.",
-            material: "Crystal with Rhodium Plating",
-            size: "1.8 cm diameter",
-            weight: "Lightweight (approx. 3g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Clean with soft cloth only",
-            category: "stud",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1602173574767-2ac316656e84?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 4,
-            name: "Crystal Dangles",
-            price: "₱329",
-            description: "Sparkling crystal dangles that catch the light beautifully. Perfect for evening events.",
-            material: "Swarovski Crystals with Sterling Silver",
-            size: "3.2 cm length",
-            weight: "Medium weight (approx. 6g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Avoid contact with water and chemicals",
-            category: "dangle",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 5,
-            name: "Silver Hoops",
-            price: "₱279",
-            description: "Minimalist silver hoops for everyday wear. Simple, elegant, and timeless.",
-            material: "925 Sterling Silver",
-            size: "2.5 cm diameter",
-            weight: "Lightweight (approx. 5g per pair)",
-            closure: "Hinged Snap",
-            hypoallergenic: "Yes",
-            care: "Use silver polishing cloth regularly",
-            category: "hoop",
-            popularity: 5,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 6,
-            name: "Rose Gold Studs",
-            price: "₱359",
-            description: "Delicate rose gold studs with a modern twist. Perfect for sensitive ears.",
-            material: "Rose Gold Plated Surgical Steel",
-            size: "0.8 cm diameter",
-            weight: "Very lightweight (approx. 2g per pair)",
-            closure: "Screw Back",
-            hypoallergenic: "Yes",
-            care: "Safe for sensitive skin, wipe clean",
-            category: "stud",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1602173574767-2ac316656e84?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 7,
-            name: "Geometric Earrings",
-            price: "₱319",
-            description: "Modern geometric design earrings for the fashion-forward individual.",
-            material: "Brass with Gold Plating",
-            size: "2.8 cm length",
-            weight: "Medium weight (approx. 7g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Keep in dry place",
-            category: "dangle",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 8,
-            name: "Floral Drops",
-            price: "₱369",
-            description: "Delicate floral design earrings with intricate details. Feminine and charming.",
-            material: "Brass with Enamel Details",
-            size: "2.2 cm length",
-            weight: "Lightweight (approx. 4g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Avoid moisture to protect enamel",
-            category: "dangle",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 9,
-            name: "Minimalist Hoops",
-            price: "₱259",
-            description: "Tiny minimalist hoops for a subtle, sophisticated look.",
-            material: "Surgical Steel",
-            size: "1.2 cm diameter",
-            weight: "Very lightweight (approx. 1.5g per pair)",
-            closure: "Hinged Snap",
-            hypoallergenic: "Yes",
-            care: "Easy to clean and maintain",
-            category: "hoop",
-            popularity: 5,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 10,
-            name: "Bold Statement",
-            price: "₱429",
-            description: "Large statement earrings for making a fashion statement. Perfect for special occasions.",
-            material: "Acrylic with Metal Details",
-            size: "4.5 cm length",
-            weight: "Lightweight (approx. 5g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Wipe clean with dry cloth",
-            category: "statement",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1602173574767-2ac316656e84?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 11,
-            name: "Moon & Stars",
-            price: "₱389",
-            description: "Celestial-themed earrings featuring moon and star charms. Magical and whimsical.",
-            material: "Sterling Silver with Gold Accents",
-            size: "3.5 cm length",
-            weight: "Medium weight (approx. 6g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Store in anti-tarnish pouch",
-            category: "dangle",
-            popularity: 5,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 12,
-            name: "Feather Dangles",
-            price: "₱339",
-            description: "Lightweight feather design earrings that move gracefully with every step.",
-            material: "Brass with Feather Details",
-            size: "3.8 cm length",
-            weight: "Very lightweight (approx. 3g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Avoid pulling on feathers",
-            category: "dangle",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 13,
-            name: "Pearl Cluster",
-            price: "₱379",
-            description: "Cluster of pearls creating a beautiful floral-like design. Elegant and timeless.",
-            material: "Freshwater Pearls with Gold Plating",
-            size: "2.0 cm diameter",
-            weight: "Lightweight (approx. 4g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Wipe pearls gently after wear",
-            category: "stud",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 14,
-            name: "Gold Bar",
-            price: "₱299",
-            description: "Minimalist gold bar earrings for a modern, sleek look.",
-            material: "Gold Plated Brass",
-            size: "2.0 cm length",
-            weight: "Lightweight (approx. 3g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Avoid contact with perfumes",
-            category: "stud",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 15,
-            name: "Diamond Studs",
-            price: "₱449",
-            description: "Classic diamond studs that sparkle with every movement. Timeless elegance.",
-            material: "Cubic Zirconia with Sterling Silver",
-            size: "0.6 cm diameter",
-            weight: "Very lightweight (approx. 1.5g per pair)",
-            closure: "Screw Back",
-            hypoallergenic: "Yes",
-            care: "Clean with jewelry cleaning solution",
-            category: "stud",
-            popularity: 5,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1602173574767-2ac316656e84?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 16,
-            name: "Silver Leaves",
-            price: "₱329",
-            description: "Nature-inspired leaf design earrings in beautiful sterling silver.",
-            material: "925 Sterling Silver",
-            size: "2.3 cm length",
-            weight: "Lightweight (approx. 4g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Polish with silver cloth regularly",
-            category: "dangle",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 17,
-            name: "Turquoise Drops",
-            price: "₱399",
-            description: "Vibrant turquoise stone drops that add a pop of color to any outfit.",
-            material: "Turquoise Stone with Sterling Silver",
-            size: "2.7 cm length",
-            weight: "Medium weight (approx. 6g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Avoid chemicals to protect stone",
-            category: "dangle",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 18,
-            name: "Crystal Hoops",
-            price: "₱369",
-            description: "Hoop earrings adorned with sparkling crystals for extra glamour.",
-            material: "Metal with Crystal Accents",
-            size: "3.0 cm diameter",
-            weight: "Medium weight (approx. 7g per pair)",
-            closure: "Hinged Snap",
-            hypoallergenic: "Yes",
-            care: "Clean crystals gently with soft brush",
-            category: "hoop",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 19,
-            name: "Ruby Red",
-            price: "₱419",
-            description: "Bold red stone earrings that command attention and exude confidence.",
-            material: "Red Crystal with Gold Plating",
-            size: "1.5 cm diameter",
-            weight: "Lightweight (approx. 4g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Wipe gently with soft cloth",
-            category: "stud",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1602173574767-2ac316656e84?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 20,
-            name: "Sapphire Blue",
-            price: "₱439",
-            description: "Deep blue sapphire-like earrings for a regal, sophisticated look.",
-            material: "Blue Crystal with Silver Plating",
-            size: "1.2 cm diameter",
-            weight: "Lightweight (approx. 3g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Store separately to avoid scratches",
-            category: "stud",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 21,
-            name: "Emerald Green",
-            price: "₱429",
-            description: "Rich green emerald-inspired studs for a touch of luxury.",
-            material: "Green Crystal with Gold Setting",
-            size: "1.0 cm diameter",
-            weight: "Lightweight (approx. 3g per pair)",
-            closure: "Screw Back",
-            hypoallergenic: "Yes",
-            care: "Clean with mild soap and water",
-            category: "stud",
-            popularity: 4,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 22,
-            name: "Amethyst Drops",
-            price: "₱389",
-            description: "Beautiful purple amethyst drops that combine elegance with spiritual energy.",
-            material: "Amethyst Stone with Sterling Silver",
-            size: "3.0 cm length",
-            weight: "Medium weight (approx. 6g per pair)",
-            closure: "Hook",
-            hypoallergenic: "Yes",
-            care: "Clean stones with soft, dry cloth",
-            category: "dangle",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 23,
-            name: "Citrine Studs",
-            price: "₱359",
-            description: "Sunny yellow citrine studs that bring warmth and positivity to your look.",
-            material: "Citrine Crystal with Gold Plating",
-            size: "0.9 cm diameter",
-            weight: "Lightweight (approx. 2.5g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Avoid direct sunlight for long periods",
-            category: "stud",
-            popularity: 3,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        },
-        {
-            id: 24,
-            name: "Opal Dreams",
-            price: "₱469",
-            description: "Iridescent opal-like earrings that change colors with the light. Truly magical.",
-            material: "Opalite Stone with Silver Setting",
-            size: "1.8 cm diameter",
-            weight: "Lightweight (approx. 4g per pair)",
-            closure: "Butterfly Back",
-            hypoallergenic: "Yes",
-            care: "Handle gently, opalite can be delicate",
-            category: "statement",
-            popularity: 5,
-            inStock: true,
-            images: [
-                "https://images.unsplash.com/photo-1602173574767-2ac316656e84?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-            ]
-        }
+        // ... keep the rest of your default earings array
     ];
+}
+
+// ADD THIS FUNCTION: Fix for image paths
+function getImageUrl(imageName) {
+    console.log('Getting image URL for:', imageName);
+    
+    if (!imageName) {
+        return getDefaultImage();
+    }
+    
+    // If it's already a full URL, return it as-is
+    if (imageName.startsWith('http') || imageName.startsWith('data:')) {
+        return imageName;
+    }
+    
+    // If it's just a filename, add the correct path
+    // Remove any path prefixes that might be there
+    const cleanName = imageName.split('/').pop().split('\\').pop();
+    
+    // Check if it's a default placeholder
+    if (cleanName === 'default.jpg') {
+        return getDefaultImage();
+    }
+    
+    // Return local file path
+    return `assets/earings/${cleanName}`;
+}
+
+function getDefaultImage() {
+    return 'https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
 }
 
 function initEaringsPage() {
@@ -527,8 +143,13 @@ function initEaringsPage() {
     function createEaringCard(earing) {
         const card = document.createElement('div');
         card.className = 'product-card';
+        
+        // Get the first image or default
+        const firstImage = earing.images && earing.images.length > 0 ? earing.images[0] : null;
+        const imageUrl = getImageUrl(firstImage);
+        
         card.innerHTML = `
-            <div class="product-image" style="background-image: url('${earing.images[0] || getDefaultImage()}')"></div>
+            <div class="product-image" style="background-image: url('${imageUrl}')"></div>
             <h3>${earing.name}</h3>
             <p class="price">${earing.price}</p>
             <button class="btn-secondary view-details" data-id="${earing.id}">
@@ -536,16 +157,18 @@ function initEaringsPage() {
             </button>
         `;
         
+        // Add error handling for broken images
+        const productImage = card.querySelector('.product-image');
+        productImage.addEventListener('error', function() {
+            console.warn('Image failed to load:', imageUrl);
+            this.style.backgroundImage = `url('${getDefaultImage()}')`;
+        });
+        
         // Add click event to view details button
         const viewBtn = card.querySelector('.view-details');
         viewBtn.addEventListener('click', () => openGallery(earing));
         
         return card;
-    }
-    
-    // Get default image if none provided
-    function getDefaultImage() {
-        return 'https://images.unsplash.com/photo-1599643478510-a349f327f8c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80';
     }
     
     // Update pagination controls
@@ -654,6 +277,14 @@ function initEaringsPage() {
         // Create modal
         const modal = document.createElement('div');
         modal.className = 'gallery-modal';
+        
+        // Get images with proper URLs
+        const galleryImages = earing.images && earing.images.length > 0 
+            ? earing.images.map(img => getImageUrl(img))
+            : [getDefaultImage()];
+        
+        const mainImageUrl = galleryImages[0];
+        
         modal.innerHTML = `
             <div class="modal-content">
                 <button class="close-modal"><i class="fas fa-times"></i></button>
@@ -670,11 +301,11 @@ function initEaringsPage() {
                 <div class="product-details-grid">
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-gem"></i> Material:</span>
-                        <span class="detail-value">${earing.material}</span>
+                        <span class="detail-value">${earing.material || 'Not specified'}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-ruler"></i> Size:</span>
-                        <span class="detail-value">${earing.size}</span>
+                        <span class="detail-value">${earing.size || 'Not specified'}</span>
                     </div>
                     ${earing.weight ? `
                     <div class="detail-item">
@@ -684,23 +315,23 @@ function initEaringsPage() {
                     ` : ''}
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-lock"></i> Closure:</span>
-                        <span class="detail-value">${earing.closure}</span>
+                        <span class="detail-value">${earing.closure || 'Butterfly Back'}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label"><i class="fas fa-heart"></i> Hypoallergenic:</span>
-                        <span class="detail-value">${earing.hypoallergenic}</span>
+                        <span class="detail-value">${earing.hypoallergenic || 'Yes'}</span>
                     </div>
                 </div>
                 
                 <!-- Gallery Images -->
                 <div class="gallery-main">
-                    <div class="main-image" style="background-image: url('${earing.images[0] || getDefaultImage()}')"></div>
+                    <div class="main-image" style="background-image: url('${mainImageUrl}')"></div>
                 </div>
                 
                 <!-- Thumbnails -->
-                ${earing.images.length > 1 ? `
+                ${galleryImages.length > 1 ? `
                 <div class="gallery-thumbnails">
-                    ${earing.images.map((img, index) => `
+                    ${galleryImages.map((img, index) => `
                         <div class="thumbnail ${index === 0 ? 'active' : ''}" 
                              style="background-image: url('${img}')" 
                              data-index="${index}"></div>
@@ -745,7 +376,7 @@ function initEaringsPage() {
         }
         
         // Add event listeners
-        setupModalEvents(modal, earing);
+        setupModalEvents(modal, earing, galleryImages);
     }
     
     // Get modal CSS styles
@@ -975,7 +606,7 @@ function initEaringsPage() {
     }
     
     // Setup modal event listeners
-    function setupModalEvents(modal, earing) {
+    function setupModalEvents(modal, earing, galleryImages) {
         // Close button
         modal.querySelector('.close-modal').addEventListener('click', () => {
             document.body.removeChild(modal);
@@ -984,7 +615,7 @@ function initEaringsPage() {
         // Thumbnail click events
         modal.querySelectorAll('.thumbnail').forEach(thumb => {
             thumb.addEventListener('click', function() {
-                const index = this.getAttribute('data-index');
+                const index = parseInt(this.getAttribute('data-index'));
                 
                 // Update active thumbnail
                 modal.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
@@ -992,7 +623,7 @@ function initEaringsPage() {
                 
                 // Update main image
                 const mainImage = modal.querySelector('.main-image');
-                mainImage.style.backgroundImage = `url('${earing.images[index]}')`;
+                mainImage.style.backgroundImage = `url('${galleryImages[index]}')`;
             });
         });
         
