@@ -1,4 +1,4 @@
-// Admin Form JavaScript - Complete with working Edit functionality
+// Admin Form JavaScript - Fixed Edit & Save Issues
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.querySelector('.admin-form-page')) return;
     
@@ -17,8 +17,15 @@ function initAdminForm() {
     const jsonOutput = document.getElementById('json-output');
     const copyJsonBtn = document.getElementById('copy-json-btn');
     const downloadJsonBtn = document.getElementById('download-json-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn') || createCancelButton();
-    const editStatus = document.getElementById('edit-status') || createEditStatus();
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const editStatus = document.getElementById('edit-status');
+    const saveBtn = document.querySelector('.btn-save');
+    
+    // Check if elements exist
+    if (!form) {
+        console.error('Form not found!');
+        return;
+    }
     
     // Load data immediately
     loadInitialData().then(data => {
@@ -67,11 +74,13 @@ function initAdminForm() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         console.log('=== FORM SUBMIT START ===');
+        console.log('Editing ID:', editingId);
         saveEaring();
     });
     
     // Form reset
     form.addEventListener('reset', function() {
+        console.log('Form reset');
         clearEditState();
     });
     
@@ -84,6 +93,7 @@ function initAdminForm() {
     // Cancel edit button
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener('click', function() {
+            console.log('Cancel edit clicked');
             clearEditState();
             form.reset();
             showNotification('Edit cancelled.', 'info');
@@ -191,7 +201,8 @@ function initAdminForm() {
     }
     
     function saveEaring() {
-        console.log('Starting save process...');
+        console.log('=== SAVE FUNCTION START ===');
+        console.log('Current editing ID:', editingId);
         
         // Get form values
         const name = document.getElementById('earing-name').value.trim();
@@ -243,45 +254,53 @@ function initAdminForm() {
             }
         });
         
-        let newEaring;
         let isEditing = editingId !== null;
+        console.log('Is editing mode?', isEditing);
         
         if (isEditing) {
-            console.log('Updating existing earring ID:', editingId);
+            console.log('UPDATING existing earring ID:', editingId);
             
             // Find the earring to update
             const existingIndex = earings.findIndex(e => e.id === editingId);
+            console.log('Found at index:', existingIndex);
+            
             if (existingIndex === -1) {
                 showNotification('Earring not found. Creating new one.', 'error');
                 clearEditState();
-                return saveEaring(); // Retry as new earring
+                // Continue as new earring
+                isEditing = false;
+            } else {
+                // Update existing earring
+                const updatedEaring = {
+                    id: editingId, // Keep the same ID
+                    name: name,
+                    price: price,
+                    description: description,
+                    material: material || earings[existingIndex].material || 'Not specified',
+                    size: size || earings[existingIndex].size || 'Not specified',
+                    weight: weight || earings[existingIndex].weight || '',
+                    closure: closure || earings[existingIndex].closure || 'Butterfly Back',
+                    hypoallergenic: hypoallergenic || earings[existingIndex].hypoallergenic || 'Yes',
+                    care: care || earings[existingIndex].care || 'Keep dry and clean',
+                    category: category || earings[existingIndex].category || 'stud',
+                    popularity: earings[existingIndex].popularity || 3,
+                    inStock: earings[existingIndex].inStock !== undefined ? earings[existingIndex].inStock : true,
+                    images: images.length > 0 ? images : (earings[existingIndex].images || ['default.jpg'])
+                };
+                
+                console.log('Updated earring data:', updatedEaring);
+                
+                // Replace the old earring
+                earings[existingIndex] = updatedEaring;
+                console.log('Replaced at index:', existingIndex);
             }
+        }
+        
+        if (!isEditing) {
+            console.log('CREATING new earring');
             
-            // Update existing earring - preserve some properties
-            const originalEaring = earings[existingIndex];
-            newEaring = {
-                ...originalEaring, // Preserve all original properties
-                name: name,
-                price: price,
-                description: description,
-                material: material || 'Not specified',
-                size: size || 'Not specified',
-                weight: weight || '',
-                closure: closure || 'Butterfly Back',
-                hypoallergenic: hypoallergenic || 'Yes',
-                care: care || 'Keep dry and clean',
-                category: category || 'stud',
-                images: images.length > 0 ? images : (originalEaring.images || ['default.jpg'])
-            };
-            
-            // Replace the old earring with updated one
-            earings[existingIndex] = newEaring;
-            console.log('Updated earring at index:', existingIndex);
-        } else {
-            console.log('Creating new earring');
-            
-            // Create new earring object
-            newEaring = {
+            // Create new earring
+            const newEaring = {
                 id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
                 name: name,
                 price: price,
@@ -298,22 +317,27 @@ function initAdminForm() {
                 images: images.length > 0 ? images : ['default.jpg']
             };
             
-            // Add to earings array
+            console.log('New earring:', newEaring);
             earings.push(newEaring);
-            console.log('Added new earring. Total earings:', earings.length);
         }
+        
+        console.log('Total earings after save:', earings.length);
         
         // Save to localStorage
         try {
             localStorage.setItem('jfEarings', JSON.stringify(earings));
-            console.log('Saved to localStorage.');
+            console.log('Saved to localStorage successfully');
+            
+            // Verify save
+            const savedData = JSON.parse(localStorage.getItem('jfEarings'));
+            console.log('Verification - saved items:', savedData.length);
         } catch (error) {
             console.error('Error saving to localStorage:', error);
             showNotification('Error saving data. Please try again.', 'error');
             return;
         }
         
-        // Reset form and editing state
+        // Clear form and editing state
         form.reset();
         clearEditState();
         
@@ -327,10 +351,13 @@ function initAdminForm() {
             `✅ "${name}" added successfully!`;
         showNotification(message, 'success');
         
-        // Switch to view tab after a delay
+        // Switch to view tab
         setTimeout(() => {
-            document.querySelector('[data-tab="view-earings"]').click();
-        }, 1500);
+            const viewTab = document.querySelector('[data-tab="view-earings"]');
+            if (viewTab) {
+                viewTab.click();
+            }
+        }, 1000);
         
         console.log('=== SAVE COMPLETE ===');
     }
@@ -379,6 +406,7 @@ function initAdminForm() {
         container.querySelectorAll('.edit-earing').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = parseInt(this.getAttribute('data-id'));
+                console.log('Edit button clicked for ID:', id);
                 editEaring(id);
             });
         });
@@ -390,35 +418,39 @@ function initAdminForm() {
                 deleteEaring(id);
             });
         });
-        
-        console.log('Earings list loaded successfully');
     }
     
     function editEaring(id) {
+        console.log('=== EDIT FUNCTION START ===');
         console.log('Editing earring ID:', id);
+        
         const earing = earings.find(e => e.id === id);
         if (!earing) {
             console.error('Earring not found:', id);
+            showNotification('Earring not found.', 'error');
             return;
         }
         
+        console.log('Found earring:', earing);
+        
         // Set editing mode
         editingId = id;
+        console.log('Set editingId to:', editingId);
         
         // Update UI for edit mode
         setEditMode(true);
         
         // Fill form with earring data
-        document.getElementById('earing-name').value = earing.name;
-        document.getElementById('earing-price').value = earing.price;
-        document.getElementById('earing-description').value = earing.description;
-        document.getElementById('earing-material').value = earing.material;
-        document.getElementById('earing-size').value = earing.size;
-        document.getElementById('earing-weight').value = earing.weight;
-        document.getElementById('earing-closure').value = earing.closure;
-        document.getElementById('earing-hypoallergenic').value = earing.hypoallergenic;
-        document.getElementById('earing-care').value = earing.care;
-        document.getElementById('earing-category').value = earing.category;
+        document.getElementById('earing-name').value = earing.name || '';
+        document.getElementById('earing-price').value = earing.price || '';
+        document.getElementById('earing-description').value = earing.description || '';
+        document.getElementById('earing-material').value = earing.material || '';
+        document.getElementById('earing-size').value = earing.size || '';
+        document.getElementById('earing-weight').value = earing.weight || '';
+        document.getElementById('earing-closure').value = earing.closure || '';
+        document.getElementById('earing-hypoallergenic').value = earing.hypoallergenic || '';
+        document.getElementById('earing-care').value = earing.care || '';
+        document.getElementById('earing-category').value = earing.category || '';
         
         // Clear all image inputs first
         ['a', 'b', 'c', 'd', 'e'].forEach(letter => {
@@ -437,6 +469,7 @@ function initAdminForm() {
         
         // Fill image inputs with existing images
         if (earing.images && earing.images.length > 0) {
+            console.log('Loading images:', earing.images);
             earing.images.forEach((imagePath, index) => {
                 if (index < 5) {
                     const letter = ['a', 'b', 'c', 'd', 'e'][index];
@@ -446,6 +479,7 @@ function initAdminForm() {
                     if (input && preview) {
                         // Extract just the filename
                         const fileName = imagePath.split('/').pop();
+                        console.log(`Setting image ${letter} to:`, fileName);
                         input.value = fileName;
                         updateImagePreview(fileName, preview);
                     }
@@ -454,33 +488,48 @@ function initAdminForm() {
         }
         
         // Switch to add tab
-        document.querySelector('[data-tab="add-earing"]').click();
+        const addTab = document.querySelector('[data-tab="add-earing"]');
+        if (addTab) {
+            addTab.click();
+        }
         
         // Show message
         showNotification(`✏️ Editing "${earing.name}" - Make changes and click "Update Earring"`, 'info');
         
         // Scroll to form
-        document.getElementById('earing-form').scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+            const formElement = document.getElementById('earing-form');
+            if (formElement) {
+                formElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+        
+        console.log('=== EDIT FUNCTION END ===');
     }
     
     function setEditMode(isEditing) {
-        const saveBtn = document.querySelector('.btn-save');
+        console.log('Setting edit mode to:', isEditing);
+        
         if (saveBtn) {
             saveBtn.innerHTML = isEditing ? 
                 '<i class="fas fa-save"></i> Update Earring' : 
                 '<i class="fas fa-save"></i> Save Earring';
+            console.log('Button text changed');
         }
         
         if (editStatus) {
             editStatus.style.display = isEditing ? 'block' : 'none';
+            console.log('Edit status display:', editStatus.style.display);
         }
         
         if (cancelEditBtn) {
             cancelEditBtn.style.display = isEditing ? 'inline-block' : 'none';
+            console.log('Cancel button display:', cancelEditBtn.style.display);
         }
     }
     
     function clearEditState() {
+        console.log('Clearing edit state');
         editingId = null;
         setEditMode(false);
     }
@@ -510,7 +559,7 @@ function initAdminForm() {
             earings: earings
         };
         jsonOutput.value = JSON.stringify(jsonData, null, 2);
-        console.log('JSON output updated');
+        console.log('JSON output updated with', earings.length, 'earings');
     }
     
     function copyJSON() {
@@ -586,42 +635,7 @@ function initAdminForm() {
         }, 3000);
     }
     
-    // Helper function to create cancel button if not in HTML
-    function createCancelButton() {
-        const formActions = document.querySelector('.form-actions');
-        if (!formActions) return null;
-        
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.id = 'cancel-edit-btn';
-        cancelBtn.className = 'btn-secondary';
-        cancelBtn.innerHTML = '<i class="fas fa-times"></i> Cancel Edit';
-        cancelBtn.style.display = 'none';
-        
-        formActions.appendChild(cancelBtn);
-        return cancelBtn;
-    }
-    
-    // Helper function to create edit status if not in HTML
-    function createEditStatus() {
-        const form = document.getElementById('earing-form');
-        if (!form) return null;
-        
-        const editStatus = document.createElement('div');
-        editStatus.id = 'edit-status';
-        editStatus.style.display = 'none';
-        editStatus.style.background = '#e3f2fd';
-        editStatus.style.padding = '10px';
-        editStatus.style.borderRadius = '5px';
-        editStatus.style.marginBottom = '15px';
-        editStatus.style.borderLeft = '4px solid #2196F3';
-        editStatus.innerHTML = '<i class="fas fa-edit"></i> <strong>Editing Mode:</strong> You are editing an existing earring. Click "Update Earring" to save changes.';
-        
-        form.insertBefore(editStatus, form.firstChild);
-        return editStatus;
-    }
-    
-    // Debug helper functions
+    // Debug helper
     window.debugAdmin = {
         clearData: function() {
             localStorage.removeItem('jfEarings');
@@ -631,38 +645,26 @@ function initAdminForm() {
             showNotification('Data cleared', 'info');
         },
         showData: function() {
+            console.log('=== DEBUG INFO ===');
             console.log('Current earings:', earings);
             console.log('localStorage:', JSON.parse(localStorage.getItem('jfEarings') || '[]'));
             console.log('Editing ID:', editingId);
+            console.log('Earings count:', earings.length);
+            console.log('=== END DEBUG ===');
         },
-        addSample: function() {
-            const sampleEaring = {
-                id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
-                name: "Sample Earring " + (earings.length + 1),
-                price: "₱299",
-                description: "This is a sample earring for testing.",
-                material: "Test Material",
-                size: "2.5 cm",
-                weight: "Lightweight",
-                closure: "Butterfly Back",
-                hypoallergenic: "Yes",
-                care: "Keep dry and clean",
-                category: "stud",
-                popularity: 3,
-                inStock: true,
-                images: ["earing" + (earings.length + 1) + "a.jpg"]
-            };
-            
-            earings.push(sampleEaring);
-            localStorage.setItem('jfEarings', JSON.stringify(earings));
-            loadEaringsList();
-            updateJSONOutput();
-            showNotification('Sample added', 'success');
+        testEdit: function(id) {
+            if (id) {
+                editEaring(id);
+            } else if (earings.length > 0) {
+                editEaring(earings[0].id);
+            } else {
+                console.log('No earrings to edit');
+            }
         }
     };
     
-    console.log('Admin form ready. Debug commands available:');
-    console.log('- debugAdmin.clearData() - Clear all earings');
-    console.log('- debugAdmin.showData() - Show current data');
-    console.log('- debugAdmin.addSample() - Add sample earring');
+    console.log('Admin form ready. Debug commands:');
+    console.log('- debugAdmin.clearData() - Clear all');
+    console.log('- debugAdmin.showData() - Show data');
+    console.log('- debugAdmin.testEdit() - Test edit');
 }
