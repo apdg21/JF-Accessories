@@ -270,7 +270,7 @@ h1, h2, h3, h4 {
 }
 
 .product-image {
-    height: auto;
+    height: 280px;
     width: 280px;
     background-size: cover;
     background-position: center;
