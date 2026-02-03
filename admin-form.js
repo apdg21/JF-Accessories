@@ -1,4 +1,4 @@
-// Admin Form JavaScript - Simplified with working Edit
+// Admin Form JavaScript - Complete with JSON loading and stock management
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.querySelector('.admin-form-page')) return;
     
@@ -11,7 +11,6 @@ function initAdminForm() {
     // Initialize earings data and editing state
     let earings = [];
     let editingId = null;
-    let draggedItem = null;
     
     // Load data immediately
     loadInitialData().then(data => {
@@ -66,7 +65,12 @@ function initAdminForm() {
             if (tabId === 'view-earings') {
                 loadEaringsList();
             } else if (tabId === 'export-data') {
-                updateJSONOutput();
+                // Auto-load JSON into editor
+                setTimeout(() => {
+                    if (!jsonOutput.value.trim()) {
+                        loadJSONForEdit();
+                    }
+                }, 100);
             }
         });
     });
@@ -95,6 +99,9 @@ function initAdminForm() {
         clearEditState();
     });
     
+    // Load JSON button
+    document.getElementById('load-json-btn').addEventListener('click', loadFromJSONFile);
+    
     // Copy JSON button
     document.getElementById('copy-json-btn').addEventListener('click', copyJSON);
     
@@ -113,8 +120,19 @@ function initAdminForm() {
             const saved = localStorage.getItem('jfEarings');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                console.log('Loaded from localStorage:', parsed.length, 'items');
-                return Array.isArray(parsed) ? parsed : [];
+                console.log('Loaded from localStorage');
+                
+                // Handle both formats
+                if (Array.isArray(parsed)) {
+                    console.log('Array format:', parsed.length, 'items');
+                    return parsed;
+                } else if (parsed && parsed.earings && Array.isArray(parsed.earings)) {
+                    console.log('Object format:', parsed.earings.length, 'items');
+                    return parsed.earings;
+                } else {
+                    console.warn('Invalid format, returning empty array');
+                    return [];
+                }
             }
         } catch (error) {
             console.error('Error loading from localStorage:', error);
@@ -197,6 +215,17 @@ function initAdminForm() {
         const hypoallergenic = document.getElementById('earing-hypoallergenic').value;
         const care = document.getElementById('earing-care').value.trim();
         const category = document.getElementById('earing-category').value;
+        const stockInput = document.getElementById('earing-stock').value.trim();
+        
+        // Parse stock
+        let stock = null;
+        if (stockInput !== '') {
+            stock = parseInt(stockInput);
+            if (isNaN(stock) || stock < 0) {
+                showNotification('Stock quantity must be a positive number or zero.', 'error');
+                return;
+            }
+        }
         
         // Get images
         const images = [];
@@ -209,6 +238,9 @@ function initAdminForm() {
             }
         });
         
+        // Calculate inStock status
+        const inStock = stock !== null ? stock > 0 : true;
+        
         // Check if editing or adding new
         if (editingId !== null) {
             console.log('UPDATING earring ID:', editingId);
@@ -216,7 +248,6 @@ function initAdminForm() {
             // Find and update existing earring
             const index = earings.findIndex(e => e.id === editingId);
             if (index !== -1) {
-                // Update the existing earring
                 earings[index] = {
                     ...earings[index],
                     name,
@@ -229,66 +260,47 @@ function initAdminForm() {
                     hypoallergenic: hypoallergenic || 'Yes',
                     care: care || 'Keep dry and clean',
                     category: category || 'stud',
+                    stock: stock !== null ? stock : earings[index].stock,
+                    inStock: inStock,
                     images: images.length > 0 ? images : earings[index].images || ['default.jpg']
                 };
                 
                 console.log('Updated earring at index:', index);
                 showNotification(`✅ "${name}" updated successfully!`, 'success');
-                
-                // Save to localStorage
-                localStorage.setItem('jfEarings', JSON.stringify(earings));
-                
-                // Reset form
-                form.reset();
-                clearEditState();
-                
-                // Update views
-                loadEaringsList();
-                updateJSONOutput();
-                
-                // Switch to view tab after delay
-                setTimeout(() => {
-                    document.querySelector('[data-tab="view-earings"]').click();
-                }, 1000);
             } else {
                 showNotification('Earring not found. Creating new one.', 'info');
-                createNewEaring(name, price, description, material, size, weight, closure, hypoallergenic, care, category, images);
+                editingId = null;
+                return saveEaring(); // Retry as new
             }
         } else {
             console.log('CREATING new earring');
-            createNewEaring(name, price, description, material, size, weight, closure, hypoallergenic, care, category, images);
+            
+            // Create new earring
+            const newEaring = {
+                id: earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1,
+                name,
+                price,
+                description,
+                material: material || 'Not specified',
+                size: size || 'Not specified',
+                weight: weight || '',
+                closure: closure || 'Butterfly Back',
+                hypoallergenic: hypoallergenic || 'Yes',
+                care: care || 'Keep dry and clean',
+                category: category || 'stud',
+                popularity: 3,
+                stock: stock !== null ? stock : null,
+                inStock: inStock,
+                images: images.length > 0 ? images : ['default.jpg']
+            };
+            
+            earings.push(newEaring);
+            console.log('Added new earring. Total:', earings.length);
+            showNotification(`✅ "${name}" added successfully!`, 'success');
         }
         
-        console.log('=== SAVE COMPLETE ===');
-    }
-    
-    function createNewEaring(name, price, description, material, size, weight, closure, hypoallergenic, care, category, images) {
-        // Create new earring with unique ID
-        const newId = earings.length > 0 ? Math.max(...earings.map(e => e.id)) + 1 : 1;
-        
-        const newEaring = {
-            id: newId,
-            name,
-            price,
-            description,
-            material: material || 'Not specified',
-            size: size || 'Not specified',
-            weight: weight || '',
-            closure: closure || 'Butterfly Back',
-            hypoallergenic: hypoallergenic || 'Yes',
-            care: care || 'Keep dry and clean',
-            category: category || 'stud',
-            popularity: 3,
-            inStock: true,
-            images: images.length > 0 ? images : ['default.jpg']
-        };
-        
-        earings.push(newEaring);
-        console.log('Added new earring. Total:', earings.length);
-        showNotification(`✅ "${name}" added successfully!`, 'success');
-        
         // Save to localStorage
-        localStorage.setItem('jfEarings', JSON.stringify(earings));
+        localStorage.setItem('jfEarings', JSON.stringify({ earings: earings }));
         
         // Reset form
         form.reset();
@@ -302,6 +314,8 @@ function initAdminForm() {
         setTimeout(() => {
             document.querySelector('[data-tab="view-earings"]').click();
         }, 1000);
+        
+        console.log('=== SAVE COMPLETE ===');
     }
     
     function loadEaringsList() {
@@ -320,31 +334,39 @@ function initAdminForm() {
         }
         
         container.innerHTML = `
-            <div class="earings-list" id="sortable-earings-list">
+            <div class="earings-list">
                 ${earings.map((earing, index) => `
                     <div class="earing-item" draggable="true" data-index="${index}" data-id="${earing.id}">
-                        <div class="earing-image" style="background-image: url('${getImageUrl(earing.images[0])}')"></div>
+                        <div class="earing-image" style="background-image: url('${getImageUrl(earing.images[0])}')">
+                            ${!earing.inStock || earing.stock === 0 ? 
+                                '<div class="admin-out-of-stock">SOLD OUT</div>' : ''}
+                        </div>
                         <div class="earing-info">
                             <h3 class="earing-name">${earing.name}</h3>
                             <p class="earing-price">${earing.price}</p>
-                            <p class="earing-index"><small>Position: ${index + 1}</small></p>
+                            <p class="earing-stock">
+                                <i class="fas fa-box"></i> 
+                                ${earing.stock !== null && earing.stock !== undefined ? 
+                                    `${earing.stock} in stock` : 
+                                    (earing.inStock ? 'In stock' : 'Out of stock')
+                                }
+                            </p>
                             <div class="earing-actions">
                                 <button class="btn-edit" data-id="${earing.id}">
                                     <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-stock-toggle ${!earing.inStock ? 'out-of-stock' : ''}" 
+                                        data-id="${earing.id}" data-instock="${earing.inStock}">
+                                    <i class="fas fa-${earing.inStock ? 'times' : 'check'}"></i> 
+                                    ${earing.inStock ? 'Mark Sold Out' : 'Mark In Stock'}
                                 </button>
                                 <button class="btn-delete" data-id="${earing.id}">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
                         </div>
-                        <div class="drag-handle">
-                            <i class="fas fa-arrows-alt"></i>
-                        </div>
                     </div>
                 `).join('')}
-            </div>
-            <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                <p><strong>Drag & Drop:</strong> Drag items to reorder them. Changes save automatically.</p>
             </div>
         `;
         
@@ -356,103 +378,94 @@ function initAdminForm() {
             });
         });
         
+        container.querySelectorAll('.btn-stock-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = parseInt(this.getAttribute('data-id'));
+                const currentStatus = this.getAttribute('data-instock') === 'true';
+                
+                const index = earings.findIndex(e => e.id === id);
+                if (index !== -1) {
+                    earings[index].inStock = !currentStatus;
+                    earings[index].stock = !currentStatus ? (earings[index].stock || 1) : 0;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('jfEarings', JSON.stringify({ earings: earings }));
+                    
+                    // Reload the list
+                    loadEaringsList();
+                    updateJSONOutput();
+                    showNotification(`Stock status updated for "${earings[index].name}"`, 'success');
+                }
+            });
+        });
+        
         container.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = parseInt(this.getAttribute('data-id'));
-                if (confirm('Delete this earring?')) {
+                if (confirm('Are you sure you want to delete this earring?')) {
                     deleteEaring(id);
                 }
             });
         });
-        
-        // Setup drag and drop
-        setupDragAndDrop();
     }
     
-    function setupDragAndDrop() {
-        const container = document.getElementById('sortable-earings-list');
-        if (!container) return;
+    async function loadFromJSONFile() {
+        console.log('Loading from JSON file...');
         
-        const items = container.querySelectorAll('.earing-item');
-        
-        items.forEach(item => {
-            // Drag start
-            item.addEventListener('dragstart', (e) => {
-                draggedItem = item;
-                setTimeout(() => {
-                    item.style.opacity = '0.4';
-                }, 0);
-                e.dataTransfer.effectAllowed = 'move';
-            });
-            
-            // Drag end
-            item.addEventListener('dragend', (e) => {
-                setTimeout(() => {
-                    draggedItem.style.opacity = '1';
-                    draggedItem = null;
-                }, 0);
-                
-                // Update positions after drop
-                updatePositionsAfterDrag();
-            });
-            
-            // Drag over
-            item.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-            
-            // Drag enter
-            item.addEventListener('dragenter', (e) => {
-                e.preventDefault();
-                if (draggedItem && item !== draggedItem) {
-                    item.style.border = '2px dashed #3498db';
-                    item.style.boxShadow = '0 0 10px rgba(52, 152, 219, 0.3)';
-                }
-            });
-            
-            // Drag leave
-            item.addEventListener('dragleave', (e) => {
-                if (draggedItem && item !== draggedItem) {
-                    item.style.border = '1px solid #eee';
-                    item.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
-                }
-            });
-            
-            // Drop
-            item.addEventListener('drop', (e) => {
-                e.preventDefault();
-                if (draggedItem && item !== draggedItem) {
-                    item.style.border = '1px solid #eee';
-                    item.style.boxShadow = '0 3px 10px rgba(0,0,0,0.1)';
-                    
-                    // Get indices
-                    const fromIndex = parseInt(draggedItem.getAttribute('data-index'));
-                    const toIndex = parseInt(item.getAttribute('data-index'));
-                    
-                    // Reorder array
-                    const [movedItem] = earings.splice(fromIndex, 1);
-                    earings.splice(toIndex, 0, movedItem);
-                    
-                    // Save and reload
-                    localStorage.setItem('jfEarings', JSON.stringify(earings));
-                    loadEaringsList();
-                    updateJSONOutput();
-                    showNotification('Order updated!', 'success');
-                }
-            });
-        });
-    }
-    
-    function updatePositionsAfterDrag() {
-        const items = document.querySelectorAll('.earing-item');
-        items.forEach((item, index) => {
-            item.setAttribute('data-index', index);
-            const indexElement = item.querySelector('.earing-index');
-            if (indexElement) {
-                indexElement.innerHTML = `<small>Position: ${index + 1}</small>`;
+        try {
+            const response = await fetch('earings-data.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load JSON: ${response.status} ${response.statusText}`);
             }
-        });
+            
+            const data = await response.json();
+            console.log('JSON data loaded:', data);
+            
+            if (data && data.earings && Array.isArray(data.earings)) {
+                // Replace current earings with JSON data
+                earings = data.earings;
+                
+                // Save to localStorage for backup
+                localStorage.setItem('jfEarings', JSON.stringify({ earings: earings }));
+                
+                // Update UI
+                loadEaringsList();
+                updateJSONOutput();
+                
+                showNotification(`✅ Loaded ${earings.length} earings from JSON file`, 'success');
+                
+                // Switch to View tab to show updated list
+                document.querySelector('[data-tab="view-earings"]').click();
+            } else {
+                throw new Error('Invalid JSON format: missing earings array');
+            }
+        } catch (error) {
+            console.error('Error loading JSON:', error);
+            showNotification(`❌ Failed to load JSON: ${error.message}`, 'error');
+        }
+    }
+    
+    async function loadJSONForEdit() {
+        console.log('Loading JSON for editing...');
+        
+        try {
+            const response = await fetch('earings-data.json');
+            if (!response.ok) throw new Error('Failed to load JSON file');
+            
+            const data = await response.json();
+            if (data && data.earings) {
+                // Update JSON output textarea
+                const jsonOutput = document.getElementById('json-output');
+                if (jsonOutput) {
+                    jsonOutput.value = JSON.stringify(data, null, 2);
+                }
+                
+                showNotification('✅ JSON data loaded into editor', 'success');
+            }
+        } catch (error) {
+            console.error('Error loading JSON for edit:', error);
+            showNotification('❌ Failed to load JSON file', 'error');
+        }
     }
     
     function deleteEaring(id) {
@@ -460,7 +473,7 @@ function initAdminForm() {
         earings = earings.filter(e => e.id !== id);
         
         if (earings.length < originalLength) {
-            localStorage.setItem('jfEarings', JSON.stringify(earings));
+            localStorage.setItem('jfEarings', JSON.stringify({ earings: earings }));
             loadEaringsList();
             updateJSONOutput();
             showNotification('Earring deleted.', 'success');
@@ -502,6 +515,7 @@ function initAdminForm() {
         document.getElementById('earing-hypoallergenic').value = earing.hypoallergenic || '';
         document.getElementById('earing-care').value = earing.care || '';
         document.getElementById('earing-category').value = earing.category || '';
+        document.getElementById('earing-stock').value = earing.stock !== undefined ? earing.stock : '';
         
         // Clear image inputs first
         ['a', 'b', 'c', 'd', 'e'].forEach(letter => {
