@@ -729,39 +729,50 @@
                 </div>
             </div>
             
-            <!-- Export Data Tab -->
-            <div id="export-data" class="tab-content">
-                <h3>Export Earrings Data</h3>
-                <p>Copy the JSON data below and save it to <code>earings-data.json</code> file.</p>
-                
-                <div style="margin: 1.5rem 0;">
-                    <button id="copy-json-btn" class="btn-primary">
-                        <i class="fas fa-copy"></i> Copy JSON to Clipboard
-                    </button>
-                    <button id="download-json-btn" class="btn-secondary">
-                        <i class="fas fa-download"></i> Download JSON File
-                    </button>
-                </div>
-                
-                <div style="margin-bottom: 1rem;">
-                    <label><strong>JSON Data:</strong></label>
-                    <div class="form-help">Copy this data and save as earings-data.json</div>
-                </div>
-                
-                <textarea id="json-output" style="width: 100%; height: 300px; padding: 1rem; font-family: 'Courier New', monospace; border: 2px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
-                
-                <div style="margin-top: 1rem;">
-                    <p><strong>Instructions:</strong></p>
-                    <ol style="margin-left: 1.5rem;">
-                        <li>Copy the JSON data above</li>
-                        <li>Open the <code>earings-data.json</code> file in your website folder</li>
-                        <li>Replace all content with the copied JSON</li>
-                        <li>Save the file</li>
-                        <li>Refresh the earings page to see changes</li>
-                    </ol>
-                </div>
-            </div>
+            <!-- Update the Export Data tab instructions -->
+<div id="export-data" class="tab-content">
+    <h3>Export Earrings Data</h3>
+    <p>Copy the JSON data below and save it to <code>earings-data.json</code> file.</p>
+    
+    <div style="margin: 1.5rem 0;">
+        <button id="copy-json-btn" class="btn-primary">
+            <i class="fas fa-copy"></i> Copy JSON to Clipboard
+        </button>
+        <button id="download-json-btn" class="btn-secondary">
+            <i class="fas fa-download"></i> Download JSON File
+        </button>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label><strong>JSON Data:</strong></label>
+        <div class="form-help">Copy this data and save as earings-data.json</div>
+    </div>
+    
+    <textarea id="json-output" style="width: 100%; height: 300px; padding: 1rem; font-family: 'Courier New', monospace; border: 2px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
+    
+    <div style="margin-top: 1rem;">
+        <p><strong>Workflow Instructions:</strong></p>
+        <ol style="margin-left: 1.5rem;">
+            <li><strong>To edit existing data:</strong> Upload your <code>earings-data.json</code> file using the "Upload JSON File" button in the View tab</li>
+            <li><strong>Make changes</strong> using the admin form (add/edit/delete items)</li>
+            <li><strong>Export data:</strong> Copy the JSON data above</li>
+            <li>Open the <code>earings-data.json</code> file in your website folder</li>
+            <li>Replace all content with the copied JSON</li>
+            <li>Save the file and refresh the earings page to see changes</li>
+            <li><strong>Or</strong> download the JSON file and replace your existing one</li>
+        </ol>
+        
+        <div class="quick-tips" style="margin-top: 1.5rem;">
+            <h4><i class="fas fa-lightbulb"></i> Tips:</h4>
+            <ul>
+                <li>Always backup your <code>earings-data.json</code> file before uploading a new version</li>
+                <li>You can edit the JSON file directly in a text editor if you prefer</li>
+                <li>To mark items as out of stock, set <code>"inStock": false</code> or <code>"stock": 0</code> in the JSON</li>
+                <li>The website will show "Sold Out" badges for items with <code>inStock: false</code> or <code>stock: 0</code></li>
+            </ul>
         </div>
+    </div>
+</div>
     </main>
     
     <div id="footer-container"></div>
