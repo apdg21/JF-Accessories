@@ -1189,3 +1189,86 @@ h1, h2, h3, h4 {
         min-width: auto;
     }
 }
+/* Thank You Page */
+.thank-you-section {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+}
+
+.thank-you-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 3rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.checkmark i {
+    font-size: 5rem;
+    color: #2ecc71;
+    margin-bottom: 2rem;
+}
+
+.thank-you-content h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.message {
+    font-size: 1.2rem;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.response-time {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.actions .btn-primary,
+.actions .btn-secondary {
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .thank-you-content {
+        padding: 2rem;
+    }
+    
+    .checkmark i {
+        font-size: 4rem;
+    }
+    
+    .thank-you-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .actions a {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
