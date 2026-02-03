@@ -229,11 +229,19 @@
         }
         
         /* View Earrings Tab */
+        .view-earrings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
         .earings-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
-            margin-top: 1.5rem;
         }
         
         .earing-item {
@@ -243,6 +251,7 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             transition: var(--transition);
             border: 1px solid #eee;
+            position: relative;
         }
         
         .earing-item:hover {
@@ -255,6 +264,20 @@
             background-size: cover;
             background-position: center;
             background-color: #f5f5f5;
+            position: relative;
+        }
+        
+        .admin-out-of-stock {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
         }
         
         .earing-info {
@@ -271,7 +294,20 @@
             color: var(--accent-color);
             font-weight: 600;
             font-size: 1.1rem;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .earing-stock {
+            font-size: 0.9rem;
+            color: #666;
             margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .earing-stock i {
+            color: var(--primary-color);
         }
         
         .earing-actions {
@@ -280,7 +316,7 @@
             margin-top: 1rem;
         }
         
-        .btn-edit, .btn-delete {
+        .btn-edit, .btn-delete, .btn-stock-toggle {
             padding: 0.5rem 1rem;
             border-radius: 5px;
             border: none;
@@ -297,6 +333,15 @@
         .btn-delete {
             background-color: #e74c3c;
             color: white;
+        }
+        
+        .btn-stock-toggle {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-stock-toggle.out-of-stock {
+            background-color: #e67e22;
         }
         
         /* Notification */
@@ -406,6 +451,15 @@
             .form-actions button {
                 width: 100%;
             }
+            
+            .view-earrings-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .earing-actions {
+                flex-direction: column;
+            }
         }
         
         @media (max-width: 480px) {
@@ -417,42 +471,6 @@
                 padding: 1rem;
             }
         }
-        /* Drag and Drop Styles */
-.earing-item {
-    position: relative;
-}
-
-.drag-handle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 4px;
-    cursor: move;
-    color: #666;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.earing-item:hover .drag-handle {
-    opacity: 1;
-}
-
-.earing-item.dragging {
-    opacity: 0.5;
-}
-
-.earing-index {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 0.5rem;
-}
-
-.earing-item.drag-over {
-    border: 2px dashed #3498db !important;
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.3) !important;
-}
     </style>
 </head>
 <body>
@@ -550,10 +568,10 @@
                                 <option value="">Select if known</option>
                                 <option value="Butterfly Back">Butterfly Back</option>
                                 <option value="Screw Back">Screw Back</option>
-                                <option value="Push Back">Push Back</option>
                                 <option value="Hinged Snap">Hinged Snap</option>
                                 <option value="Hook">Hook</option>
                                 <option value="Leverback">Leverback</option>
+                                <option value="Push Back">Push Back</option>
                             </select>
                         </div>
                         
@@ -582,6 +600,13 @@
                                 <option value="statement">Statement</option>
                                 <option value="huggie">Huggies</option>
                             </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Stock Quantity (Optional)</label>
+                            <input type="number" class="form-input" id="earing-stock" 
+                                   placeholder="e.g., 10 (0 = out of stock)" min="0">
+                            <span class="form-help">Leave empty if not tracking. 0 = Out of stock</span>
                         </div>
                         
                         <!-- Image Section - 5 Columns -->
@@ -688,8 +713,17 @@
             
             <!-- View Earrings Tab -->
             <div id="view-earings" class="tab-content">
-                <h3>All Earrings</h3>
-                <p>Total earrings: <span id="earings-count">0</span></p>
+                <div class="view-earrings-header">
+                    <div>
+                        <h3 style="margin: 0;">All Earrings</h3>
+                        <p style="margin: 0.5rem 0 0 0;">Total earrings: <span id="earings-count">0</span></p>
+                    </div>
+                    <div>
+                        <button id="load-json-btn" class="btn-secondary" style="margin-right: 0.5rem;">
+                            <i class="fas fa-sync-alt"></i> Load from JSON File
+                        </button>
+                    </div>
+                </div>
                 <div id="earings-list-container">
                     <p>Loading earrings...</p>
                 </div>
