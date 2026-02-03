@@ -1,4 +1,4 @@
-// Admin Form JavaScript - Complete with JSON loading and stock management
+// Admin Form JavaScript - Complete with JSON upload and stock management
 document.addEventListener('DOMContentLoaded', function() {
     if (!document.querySelector('.admin-form-page')) return;
     
@@ -12,7 +12,7 @@ function initAdminForm() {
     let earings = [];
     let editingId = null;
     
-    // Load data immediately
+    // Load data immediately from localStorage
     loadInitialData().then(data => {
         earings = data;
         console.log('Initial data loaded:', earings.length, 'earings');
@@ -65,12 +65,8 @@ function initAdminForm() {
             if (tabId === 'view-earings') {
                 loadEaringsList();
             } else if (tabId === 'export-data') {
-                // Auto-load JSON into editor
-                setTimeout(() => {
-                    if (!jsonOutput.value.trim()) {
-                        loadJSONForEdit();
-                    }
-                }, 100);
+                // Auto-update JSON output
+                updateJSONOutput();
             }
         });
     });
@@ -99,8 +95,8 @@ function initAdminForm() {
         clearEditState();
     });
     
-    // Load JSON button
-    document.getElementById('load-json-btn').addEventListener('click', loadFromJSONFile);
+    // Setup JSON upload
+    setupJSONUpload();
     
     // Copy JSON button
     document.getElementById('copy-json-btn').addEventListener('click', copyJSON);
@@ -113,9 +109,8 @@ function initAdminForm() {
     
     // FUNCTIONS
     async function loadInitialData() {
-        console.log('Loading initial data...');
+        console.log('Loading initial data from localStorage...');
         
-        // First try localStorage
         try {
             const saved = localStorage.getItem('jfEarings');
             if (saved) {
@@ -138,21 +133,89 @@ function initAdminForm() {
             console.error('Error loading from localStorage:', error);
         }
         
-        // Try JSON file as fallback
-        try {
-            const response = await fetch('earings-data.json');
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Loaded from JSON file:', data.earings?.length || 0, 'items');
-                return data.earings || [];
-            }
-        } catch (error) {
-            console.log('No JSON file found or error:', error);
-        }
-        
-        console.log('No data found, starting with empty array');
+        console.log('No data found in localStorage, starting with empty array');
         return [];
     }
+    
+    function setupJSONUpload() {
+        const uploadBtn = document.getElementById('upload-json-btn');
+        const fileInput = document.getElementById('json-file-input');
+        
+        if (!uploadBtn || !fileInput) return;
+        
+        // Click the hidden file input when button is clicked
+        uploadBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', handleJSONFileUpload);
+    }
+    
+    function handleJSONFileUpload(event) {
+        const file = event.target.files[0];
+        
+        if (!file) {
+            showNotification('No file selected.', 'error');
+            return;
+        }
+        
+        // Check file type
+        if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+            showNotification('Please select a JSON file (.json)', 'error');
+            // Reset file input
+            event.target.value = '';
+            return;
+        }
+        
+        console.log('Uploading JSON file:', file.name);
+        showNotification('Uploading JSON file...', 'info');
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                const jsonData = JSON.parse(e.target.result);
+                console.log('Parsed JSON data:', jsonData);
+                
+                if (jsonData && jsonData.earings && Array.isArray(jsonData.earings)) {
+                    // Replace current earings with uploaded data
+                    earings = jsonData.earings;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('jfEarings', JSON.stringify({ earings: earings }));
+                    
+                    // Update UI
+                    loadEaringsList();
+                    updateJSONOutput();
+                    
+                    showNotification(`✅ Successfully loaded ${earings.length} earrings from "${file.name}"`, 'success');
+                    
+                    // Switch to View tab to show updated list
+                    document.querySelector('[data-tab="view-earings"]').click();
+                    
+                    // Clear the file input
+                    document.getElementById('json-file-input').value = '';
+                } else {
+                    throw new Error('Invalid JSON format: missing "earings" array');
+                }
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                showNotification(`❌ Failed to parse JSON: ${error.message}`, 'error');
+                // Clear the file input
+                event.target.value = '';
+            }
+        };
+        
+        reader.onerror = function() {
+            showNotification('❌ Failed to read file. Please try again.', 'error');
+            // Clear the file input
+            event.target.value = '';
+        };
+        
+        reader.readAsText(file);
+    }
+ 
     
     function setupImagePreviews() {
         const letters = ['a', 'b', 'c', 'd', 'e'];
