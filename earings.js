@@ -406,7 +406,7 @@ function initEaringsPage() {
                 
                 <!-- Order Buttons -->
                 <div class="modal-actions">
-                    <a href="https://facebook.com" target="_blank" class="btn-primary">
+                    <a href="https://m.me/61587379080899" target="_blank" class="btn-primary">
                         <i class="fab fa-facebook-messenger"></i> Order on Facebook
                     </a>
                     <button class="btn-secondary chat-btn">
